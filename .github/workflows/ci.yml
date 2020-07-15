@@ -4,10 +4,10 @@ env:
 
 on:
   push:
-    branches: [*]
-    tags: [v*]
+    branches: ['*']
+    tags: ['v*']
   pull_request:
-    branches: [*]
+    branches: ['*']
 
 jobs:
   test:
