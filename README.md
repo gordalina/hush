@@ -22,7 +22,7 @@ Hush ships with a `SystemEnvironment` provider which reads environmental variabl
 | Provider | Description |
 | -------- | ----------- |
 | `SystemEnvironment` | Read environmental variables |
-| [`GcpSecretManager`](https://github.com/gordalina/hush-gcp-secret-manager) | Load secrets from Google Cloud Platform's [Secret Manager](https://cloud.google.com/secret-manager).
+| [`GcpSecretManager`](https://github.com/gordalina/hush_gcp_secret_manager) | Load secrets from Google Cloud Platform's [Secret Manager](https://cloud.google.com/secret-manager). |
 
 ## Installation
 
