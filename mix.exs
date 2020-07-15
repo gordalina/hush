@@ -8,7 +8,7 @@ defmodule Hush.MixProject do
     [
       app: :hush,
       version: @version,
-      elixir: "~> 1.10",
+      elixir: "~> 1.9",
       deps: deps(),
       docs: docs(),
       description: description(),
