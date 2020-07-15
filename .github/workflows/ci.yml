@@ -47,7 +47,6 @@ jobs:
         with:
           otp-version: '23.0'
           elixir-version: '1.10.3'
-    steps:
       - name: Generate docs
         run: |
           mix docs
