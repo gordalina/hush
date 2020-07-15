@@ -130,4 +130,4 @@ jobs:
           mix deps.get
       - name: Release
         run: |
-          echo ${{github}}
+          echo ${{github.ref}}
