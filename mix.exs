@@ -30,7 +30,8 @@ defmodule Hush.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.12", only: [:test]}
+      {:excoveralls, "~> 0.12", only: [:test]},
+      {:inch_ex, only: :docs}
     ]
   end
 
