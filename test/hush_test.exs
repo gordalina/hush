@@ -9,7 +9,7 @@ defmodule HushTest do
   test "resolve!()" do
     Application.put_env(:hush, :test_resolve_1, {:hush, Hush.Provider.Echo, "bar"})
 
-    assert Hush.resolve!()[:hush] == [test_resolve_1: "bar"]
+    assert Hush.resolve!()[:hush][:test_resolve_1] == "bar"
   end
 
   test "resolve!(config)" do
