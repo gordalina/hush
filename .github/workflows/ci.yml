@@ -5,8 +5,8 @@ env:
 on: [push, pull_request]
 
 jobs:
-  mix_test:
-    name: mix test (${{matrix.elixir}} on OTP ${{matrix.otp}})
+  test:
+    name: test (${{matrix.elixir}} on OTP ${{matrix.otp}})
     strategy:
       fail-fast: false
       matrix:
@@ -38,6 +38,32 @@ jobs:
           mix docs
           test -f doc/index.html && echo "doc/index.html exists."
           test -f doc/hush.epub && echo "doc/hush.epub exists."
+
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - otp: 21.3
+            elixir: 1.10.3
+    steps:
+      - uses: actions/checkout@v2.3.1
+      - uses: actions/setup-elixir@v1.3.0
+        with:
+          otp-version: '${{matrix.otp}}'
+          elixir-version: '${{matrix.elixir}}'
+      - name: Cache multiple paths
+        uses: actions/cache@v2
+        with:
+          path: priv/plts
+          key: ${{ hashFiles('mix.lock') }}
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Run checks
+        run: mix check
+
   docs:
     name: docs
     runs-on: ubuntu-latest

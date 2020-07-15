@@ -17,7 +17,10 @@ defmodule Hush.MixProject do
       source_url: @source_url,
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test, "coveralls.github": :test]
+      preferred_cli_env: [coveralls: :test, "coveralls.github": :test],
+      dialyzer: [
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+      ]
     ]
   end
 
@@ -29,20 +32,13 @@ defmodule Hush.MixProject do
 
   defp deps do
     [
+      {:ex_check, "~> 0.12.0", only: :dev, runtime: false},
+      {:credo, ">= 0.0.0", only: :dev, runtime: false},
+      {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
+      {:sobelow, ">= 0.0.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:excoveralls, "~> 0.12", only: [:test]},
       {:inch_ex, ">= 0.0.0", only: :docs}
-    ]
-  end
-
-  defp docs do
-    [
-      main: "readme",
-      extras: [
-        "README.md"
-      ],
-      source_ref: "v#{@version}",
-      source_url: @source_url
     ]
   end
 
@@ -58,6 +54,17 @@ defmodule Hush.MixProject do
       name: "hush",
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/gordalina/hush"}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: [
+        "README.md"
+      ],
+      source_ref: "v#{@version}",
+      source_url: @source_url
     ]
   end
 end

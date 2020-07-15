@@ -32,17 +32,17 @@ defmodule Hush.Resolver do
          {:ok, value} <- cast(value, options) do
       value
     else
+      {:error, {:cast, type}} ->
+        raise ArgumentError,
+          message:
+            "#{provider}: Could not convert config key '#{key}' to '#{type}' (possible sensitive value was hidden)"
+
       {:error, :required} ->
         raise ArgumentError,
           message:
             "#{provider}: Could not resolve required value from config key '#{key}' provided by '#{
               name
             }'"
-
-      {:error, {:cast, type}} ->
-        raise ArgumentError,
-          message:
-            "#{provider}: Could not convert config key '#{key}' to '#{type}' (possible sensitive value was hidden)"
 
       {:error, error} ->
         raise RuntimeError, message: "#{provider}: Ran into an error: #{error}"
@@ -88,7 +88,7 @@ defmodule Hush.Resolver do
     try do
       {:ok, cast!(value, type)}
     rescue
-      _err -> {:error, {:cast, type}}
+      _ -> {:error, {:cast, type}}
     end
   end
 
