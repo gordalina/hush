@@ -31,7 +31,7 @@ defmodule Hush.MixProject do
     [
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:excoveralls, "~> 0.12", only: [:test]},
-      {:inch_ex, only: :docs}
+      {:inch_ex, ">= 0.0.0", only: :docs}
     ]
   end
 
