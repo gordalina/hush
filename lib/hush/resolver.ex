@@ -1,4 +1,8 @@
 defmodule Hush.Resolver do
+  @moduledoc """
+  Replace configuration sugin provider-aware resolvers.
+  """
+
   def resolve(config) do
     try do
       {:ok, resolve!(config)}
@@ -28,9 +32,6 @@ defmodule Hush.Resolver do
          {:ok, value} <- cast(value, options) do
       value
     else
-      {:ok, :default, value} ->
-        value
-
       {:error, :required} ->
         raise ArgumentError,
           message:
@@ -50,8 +51,7 @@ defmodule Hush.Resolver do
 
   defp fetch(provider, name, options) do
     with :ok <- Hush.Provider.is?(provider),
-         {:ok, value} <- provider.fetch(name)
-    do
+         {:ok, value} <- provider.fetch(name) do
       {:ok, value}
     else
       {:error, :not_found} ->
@@ -70,7 +70,7 @@ defmodule Hush.Resolver do
     cond do
       # lets get default if it exists
       Keyword.has_key?(options, :default) ->
-        {:ok, :default, Keyword.get(options, :default)}
+        {:ok, Keyword.get(options, :default)}
 
       # return error if default is not provided and its required
       Keyword.get(options, :required, false) ->

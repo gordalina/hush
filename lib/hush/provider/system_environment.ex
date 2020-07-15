@@ -1,4 +1,8 @@
 defmodule Hush.Provider.SystemEnvironment do
+  @moduledoc """
+  Hush Provider to resolve Environmental Variables
+  """
+
   @behaviour Hush.Provider
 
   @spec load(config :: any()) :: :ok | {:error, any()}

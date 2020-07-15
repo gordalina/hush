@@ -1,4 +1,8 @@
 defmodule Hush do
+  @moduledoc """
+  Extensible runtime configuration loader with pluggable providers
+  """
+
   def resolve!() do
     runtime_config() |> resolve!()
   end

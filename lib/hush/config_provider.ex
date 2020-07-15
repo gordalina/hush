@@ -1,4 +1,8 @@
 defmodule Hush.ConfigProvider do
+  @moduledoc """
+  This config provider can be attached to your release to run automatically on boot.
+  """
+
   @behaviour Config.Provider
 
   @impl Config.Provider
