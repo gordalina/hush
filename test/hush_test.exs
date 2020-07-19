@@ -19,4 +19,16 @@ defmodule HushTest do
 
     assert Hush.resolve!(config) == [{:app, [foo: "bar"]}]
   end
+
+  test "resolve!(config) with invalid provider config" do
+    config = [
+      {:hush, [providers: [Hush.Provider.LoadFail]]}
+    ]
+
+    assert_raise(
+      ArgumentError,
+      "Could not load provider Elixir.Hush.Provider.LoadFail: fail",
+      fn -> Hush.resolve!(config) == [{:app, [foo: "bar"]}] end
+    )
+  end
 end

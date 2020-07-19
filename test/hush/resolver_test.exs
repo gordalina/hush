@@ -21,8 +21,7 @@ defmodule Hush.ResolverTest do
     assert Resolver.resolve(config) ==
              {:error,
               %RuntimeError{
-                message:
-                  "Elixir.Hush.Provider.DoesNotExist: Ran into an error: Provider Elixir.Hush.Provider.DoesNotExist is not available (nofile)"
+                message: "An error occured while trying to resolve value in provider: Elixir.Hush.Provider.DoesNotExist.\nProvider is not available (nofile)"
               }}
   end
 
@@ -65,7 +64,7 @@ defmodule Hush.ResolverTest do
              {:error,
               %ArgumentError{
                 message:
-                  "Elixir.Hush.Provider.NotFound: Could not resolve required value from config key 'foo' provided by 'HUSH_UNKNOWN'"
+                  "Could not resolve required configuration 'foo'. I was trying to evaluate 'HUSH_UNKNOWN' with Elixir.Hush.Provider.NotFound."
               }}
   end
 
@@ -85,7 +84,7 @@ defmodule Hush.ResolverTest do
              {:error,
               %ArgumentError{
                 message:
-                  "Elixir.Hush.Provider.Echo: Could not convert config key 'foo' to 'integer' (possible sensitive value was hidden)"
+                  "Although I was able to resolve configuration 'foo, I wasn't able to cast it to 'integer'."
               }}
   end
 
@@ -124,8 +123,7 @@ defmodule Hush.ResolverTest do
     assert Resolver.resolve(config) ==
              {:error,
               %RuntimeError{
-                message:
-                  "Elixir.Hush.Provider.Malformed: Ran into an error: Unexpected format from provider: wrong return. Expected {:ok, value}, {:error, :not_found} or {:error, \"error\"}"
+                message: "An error occured while trying to resolve value in provider: Elixir.Hush.Provider.Malformed.\nProvider returned an unexpected value: wrong return.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"error\"}"
               }}
   end
 end

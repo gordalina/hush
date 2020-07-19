@@ -53,7 +53,7 @@ defmodule Hush.MixProject do
     [
       name: "hush",
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/gordalina/hush"}
+      links: %{"GitHub" => @source_url}
     ]
   end
 

@@ -8,7 +8,7 @@ defmodule Hush do
   end
 
   def resolve!(config) when is_list(config) do
-    config |> load()
+    config |> load!()
     config |> Enum.map(&resolve!(&1))
   end
 
@@ -23,9 +23,13 @@ defmodule Hush do
     !function_exported?(Mix, :env, 0)
   end
 
-  defp load(config) do
+  defp load!(config) do
     for provider <- providers(config) do
-      provider.load(config)
+      case provider.load(config) do
+        {:error, message} ->
+          raise ArgumentError, "Could not load provider #{provider}: #{message}"
+        _ -> :ok
+      end
     end
   end
 

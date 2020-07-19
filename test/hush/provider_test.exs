@@ -8,12 +8,12 @@ defmodule Hush.ProviderTest do
   end
 
   test "is?() not loaded provider" do
-    msg = "Provider Elixir.Hush.Provider.DoesNotExist is not available (nofile)"
+    msg = "Provider is not available (nofile)"
     assert Provider.is?(Hush.Provider.DoesNotExist) == {:error, msg}
   end
 
   test "is?() loaded but not a provider" do
-    msg = "Provider Elixir.Hush.Provider.Unimplemented.fetch/1 is undefined"
+    msg = "Provider's fetch/1 is undefined"
     assert Provider.is?(Hush.Provider.Unimplemented) == {:error, msg}
   end
 end

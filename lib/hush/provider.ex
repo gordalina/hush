@@ -12,10 +12,10 @@ defmodule Hush.Provider do
       :ok
     else
       {:error, error} ->
-        {:error, "Provider #{provider} is not available (#{error})"}
+        {:error, "Provider is not available (#{error})"}
 
       false ->
-        {:error, "Provider #{provider}.fetch/1 is undefined"}
+        {:error, "Provider's fetch/1 is undefined"}
     end
   end
 end

@@ -35,17 +35,15 @@ defmodule Hush.Resolver do
       {:error, {:cast, type}} ->
         raise ArgumentError,
           message:
-            "#{provider}: Could not convert config key '#{key}' to '#{type}' (possible sensitive value was hidden)"
+            "Although I was able to resolve configuration '#{key}, I wasn't able to cast it to '#{type}'."
 
       {:error, :required} ->
         raise ArgumentError,
           message:
-            "#{provider}: Could not resolve required value from config key '#{key}' provided by '#{
-              name
-            }'"
+            "Could not resolve required configuration '#{key}'. I was trying to evaluate '#{name}' with #{provider}."
 
       {:error, error} ->
-        raise RuntimeError, message: "#{provider}: Ran into an error: #{error}"
+        raise RuntimeError, message: "An error occured while trying to resolve value in provider: #{provider}.\n#{error}"
     end
   end
 
@@ -61,8 +59,7 @@ defmodule Hush.Resolver do
         {:error, error}
 
       unexpected ->
-        {:error,
-         "Unexpected format from provider: #{unexpected}. Expected {:ok, value}, {:error, :not_found} or {:error, \"error\"}"}
+        {:error, "Provider returned an unexpected value: #{unexpected}.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"error\"}"}
     end
   end
 
