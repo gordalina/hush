@@ -1,17 +1,19 @@
 defmodule Hush.ConfigProviderTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Hush.ConfigProvider
   alias Hush.ConfigProvider
+  alias Hush.Provider.MockProvider
 
-  test "init() does nothing" do
+  import Mox
+
+  test "init/1 does nothing" do
     assert ConfigProvider.init(:ignored) == nil
   end
 
-  test "load() resolves config" do
-    config = [
-      {:app, [foo: {:hush, Hush.Provider.Echo, "bar"}]}
-    ]
+  test "load/2 resolves config" do
+    expect(MockProvider, :fetch, fn _ -> {:ok, "bar"} end)
+    config = [{:app, foo: {:hush, MockProvider, "bar"}}]
 
-    assert ConfigProvider.load(config, :ignored) == [{:app, [foo: "bar"]}]
+    assert ConfigProvider.load(config, :ignored) == [{:app, foo: "bar"}]
   end
 end
