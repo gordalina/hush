@@ -1,6 +1,8 @@
 defmodule Hush.Provider do
   @moduledoc """
-  Base implementation for a provider
+  Hugh relies on providers to resolve values that the consumer requests.
+
+  You can [read here](https://hexdocs.pm/hush/readme.html#writing-your-own-provider) on how to write your own provider.
   """
 
   @callback load(config :: Keyword.t()) :: :ok | {:error, any()}

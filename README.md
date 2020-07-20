@@ -4,25 +4,27 @@
 [![Coverage Status](https://coveralls.io/repos/gordalina/hush/badge.svg?branch=master)](https://coveralls.io/r/gordalina/hush?branch=master)
 [![hex.pm version](https://img.shields.io/hexpm/v/hush.svg)](https://hex.pm/packages/hush)
 
-Hush makes it easy to configure your application at runtime and in release mode, it can retrieve configuration from multiple sources and is easily extensible.
+Hush makes it easy to configure your application at runtime and in release mode, it can retrieve data from multiple sources and set it in your application configuration automatically.
 
-You'd use Hush as a configuration tuple, which gets replaced at runtime, this is useful to inject configuration that is not known at compile time.
+Hush can be used to inject configuration that is not known at compile time, such as environmental variables (e.g.: Heroku's PORT env var), sensitive credentials such as your database password, or any other information you need.
 
 ```elixir
 # config/prod.exs
 alias Hush.Provider.{GcpSecretManager,SystemEnvironment}
 
-config :your_app_name, Web.Endpoint,
+config :app, Web.Endpoint,
   http: [port: {:hush, SystemEnvironment, "PORT", [cast: :integer]}]
-  secret_key_base: {:hush, GcpSecretManager, "secret_key_base"}
+
+config :app, App.Repo,
+  password: {:hush, GcpSecretManager, "CLOUDSQL_PASSWORD"}
 ```
 
-Hush ships with a `SystemEnvironment` provider which reads environmental variables, but multiple providers exist to make your life easy in reading from other sources:
+Hush resolves configuration from using providers, it ships with a `SystemEnvironment` provider which reads environmental variables, but multiple providers exist. You can also [write your own easily](#writing-your-own-provider).
 
-| Provider | Description |
-| -------- | ----------- |
-| `SystemEnvironment` | Read environmental variables |
-| [`GcpSecretManager`](https://github.com/gordalina/hush_gcp_secret_manager) | Load secrets from Google Cloud Platform's [Secret Manager](https://cloud.google.com/secret-manager). |
+| Provider | Description | Link |
+| -------- | ----------- | ---- |
+| `SystemEnvironment` | Read environmental variables | |
+| `GcpSecretManager` | Load secrets from Google Cloud Platform's [Secret Manager](https://cloud.google.com/secret-manager). | [GitHub](https://github.com/gordalina/hush_gcp_secret_manager) |
 
 ## Installation
 
@@ -40,7 +42,7 @@ Run `mix deps.get` to install it.
 
 ## Configuration
 
-Some providers may need to initialize applications to function correctly. `SystemEnvironment` does not require any initialization and does not need to be in the list below.
+Some providers may need to initialize applications to function correctly. The providers will be explicit about whether they need to be loaded at startup or not. `GcpSecretsManager` unlike `SystemEnvironment` is one such example. To load the provider you need to configure it like so. **Note:**  does not need to be loaded at startup.
 
 ```elixir
 # config/config.exs
@@ -51,11 +53,11 @@ config :hush,
   ]
 ```
 
-## Resolving Runtime Configuration
+## Usage
 
-Hush can be loaded by calling it directly, or by using its release [Config.Provider](https://hexdocs.pm/elixir/Config.Provider.html).
+Hush can be loaded in two ways, at runtime in your application, or as a [Config.Provider](https://hexdocs.pm/elixir/Config.Provider.html) in release mode.
 
-**Loading via direct call**
+**Loading at runtime**
 
 ```elixir
 # application.ex
@@ -65,15 +67,16 @@ def start(_type, _args) do
 end
 ```
 
-**Loading via Config Provider**
+**Loading via in release mode**
+
+To load hush as a config provider, you need to define in your `releases` in `mix.exs`.
 
 ```elixir
-# mix.exs
 def project do
   [
     # ...
     releases: [
-      your_app_name: [
+      app: [
         config_providers: [{Hush.ConfigProvider, nil}]
       ]
     ]
@@ -81,7 +84,7 @@ def project do
   end
 ```
 
-If you are using Hush in both release and non-release mode, you still want to load it directly:
+If you are using Hush in both release and non-release mode, you still want to load it directly, but only in non-release mode:
 
 ```elixir
 # application.ex
@@ -91,42 +94,129 @@ def start(_, _) do
 end
 ```
 
-## Usage
+## Configuration format
 
-The configuration tuple is defined by a `:hush` atom, a provider module, a key for the provider and an optional list of options.
+Hush will resolve any tuple in the following format into a value.
 
 ```elixir
-{
-  :hush,
-  provider :: module(),
-  key :: String.t(),
-  options :: [
-    default: any(),
-    cast: :string | :integer | :float | :charlist | :atom
-  ]
-}
+{:hush, Hush.Provider, "key", options \\ []}
 ```
 
-### Defaults
+`Hush.Provider` can be any module that implements its behaviour.
+`"key"` is passed to the provider to retrieve the data.
+`options` is a a Keyword list with the following properties:
+
+- `default: any()` - If the provider can't find the value, hush will return this value
+- `optional: boolean()` - By default, Hush will raise an error if it cannot find a value and there's no default, unless you mark it as `optional`.
+- `cast: :string | :atom | :charlist | :float | :integer | :boolean | :module` - You can ask Hush to cast the value to a Elixir native type.
+
+### Examples
 
 By default if a given `key` is not found by the provider, Hush will raise an error. To prevent this, provide a `default` in the `options` component of the tuple:
 
+#### Default
+
 ```elixir
-# config/prod.exs
+# config/config.exs
 alias Hush.Provider.SystemEnvironment
 
-config :your_app_name, Web.Endpoint,
-  url: [host: {:hush, SystemEnvironment, "HOST", [default: "my-app.example"]}]
+config :app,
+  url: {:hush, SystemEnvironment, "HOST", default: "example.domain"}
+
+# result without environmental variable
+assert "example.domain" == Application.get_env(:app, :url)
+
+# result with env HOST=production.domain
+assert "production.domain" == Application.get_env(:app, :url)
 ```
 
-### Casting
+#### Casting
+
+Here we are reading the `PORT` environmental variable, casting it to an integer and returning it
 
 ```elixir
-# config/prod.exs
+# config/config.exs
 alias Hush.Provider.SystemEnvironment
 
-config :your_app_name, Web.Endpoint,
-  http: [port: {:hush, SystemEnvironment, "PORT", [cast: :integer, default: 4000]}]
+config :app,
+  port: {:hush, SystemEnvironment, "PORT", cast: :integer, default: 4000}
+
+# result without environmental variable
+assert 4000 == Application.get_env(:app, :url)
+
+# result with env PORT=443
+assert 443 == Application.get_env(:app, :url)
+```
+
+#### Optional
+
+```elixir
+# config/dev.exs
+alias Hush.Provider.SystemEnvironment
+
+config :app,
+  can_be_nil: {:hush, SystemEnvironment, "KEY", optional: true}
+
+# result without environmental variable
+assert nil == Application.get_env(:app, :can_be_nil)
+
+# result with env KEY="is not nil"
+assert "is not nil" == Application.get_env(:app, :can_be_nil)
+```
+
+## Writing your own provider
+
+An example provider is `Hush.Provider.SystemEnvironment`, which reads
+environmental variables at runtime. Here's an example of how that provider
+would look in a app configuration.
+
+```elixir
+  alias Hush.Provider.SystemEnvironment
+
+  config :app, Web.Endpoint,
+    http: [port: {:hush, SystemEnvironment, "PORT", [cast: :integer, default: 4000]}]
+```
+
+This behaviour expects two functions:
+
+- ```elixir
+  load(config :: Keyword.t()) :: :ok | {:error, any()}
+  ```
+
+  This function is called at startup time, here you can perform any initialization you need, such as loading applications that you depend on.
+
+- ```elixir
+  fetch(key :: String.t()) :: {:ok, String.t()} | {:error, :not_found} | {:error, any()}
+  ```
+
+  This function is called when hush is resolving a key with you provider.
+  Ensure that you implement a `{:error, :not_found}` if the value can't be found as hush will replace with it a default one if the user providede one.
+
+  Note: All values are required by default, so if the user did not supply a default or made it optional, hush will trigger the error, you don't need to handle that use-case.
+
+To implement that provider we can use the following code.
+
+```elixir
+  defmodule Hush.Provider.SystemEnvironment do
+  @moduledoc """
+  Provider to resolve runtime environmental variables
+  """
+
+  @behaviour Hush.Provider
+
+  @impl Hush.Provider
+  @spec load(config :: Keyword.t()) :: :ok | {:error, any()}
+  def load(_config), do: :ok
+
+  @impl Hush.Provider
+  @spec fetch(key :: String.t()) :: {:ok, String.t()} | {:error, :not_found}
+  def fetch(key) do
+    case System.get_env(key) do
+      nil -> {:error, :not_found}
+      value -> {:ok, value}
+    end
+  end
+end
 ```
 
 ## License
