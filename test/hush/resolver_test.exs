@@ -30,13 +30,13 @@ defmodule Hush.ResolverTest do
 
     test "with required error" do
       expect(MockProvider, :fetch, fn _ -> {:error, :not_found} end)
-      config = app_config({:hush, MockProvider, "HUSH_UNKNOWN", required: true})
+      config = app_config({:hush, MockProvider, "HUSH_UNKNOWN"})
 
       assert Resolver.resolve(config) ==
                {:error,
                 %ArgumentError{
                   message:
-                    "Could not resolve required configuration 'foo'. I was trying to evaluate 'HUSH_UNKNOWN' with Elixir.Hush.Provider.MockProvider."
+                    "Could not resolve 'foo'. I was trying to evaluate 'HUSH_UNKNOWN' with Elixir.Hush.Provider.MockProvider. If this is an optional key, you add `optional: true` to the options list."
                 }}
     end
 

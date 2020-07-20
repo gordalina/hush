@@ -52,13 +52,13 @@ defmodule Hush.Provider do
       Keyword.has_key?(options, :default) ->
         {:ok, Keyword.get(options, :default)}
 
-      # return error if default is not provided and its required
-      Keyword.get(options, :required, false) ->
-        {:error, :required}
-
-      # return nil if not required
-      true ->
+      # return nil if optional is set
+      Keyword.get(options, :optional, false) ->
         {:ok, nil}
+
+      # return error in any other case
+      true ->
+        {:error, :required}
     end
   end
 end

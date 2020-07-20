@@ -48,9 +48,7 @@ defmodule Hush.Resolver do
       {:error, :required} ->
         raise ArgumentError,
           message:
-            "Could not resolve required configuration '#{key}'. I was trying to evaluate '#{name}' with #{
-              provider
-            }."
+            "Could not resolve '#{key}'. I was trying to evaluate '#{name}' with #{provider}. If this is an optional key, you add `optional: true` to the options list."
 
       {:error, :cast} ->
         raise ArgumentError,

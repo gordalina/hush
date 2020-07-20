@@ -29,7 +29,7 @@ defmodule Hush.ProviderTest do
   describe "fetch/3" do
     test "nil" do
       expect(MockProvider, :fetch, fn _ -> {:error, :not_found} end)
-      assert Provider.fetch(MockProvider, "foo") == {:ok, nil}
+      assert Provider.fetch(MockProvider, "foo") == {:error, :required}
     end
 
     test "default" do
