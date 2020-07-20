@@ -6,6 +6,10 @@
 
 Hush makes it easy to configure your application at runtime and in release mode, it can retrieve data from multiple sources and set it in your application configuration automatically.
 
+Documentation can be found at [https://hexdocs.pm/hush](https://hexdocs.pm/hush).
+
+## Overview
+
 Hush can be used to inject configuration that is not known at compile time, such as environmental variables (e.g.: Heroku's PORT env var), sensitive credentials such as your database password, or any other information you need.
 
 ```elixir
@@ -39,8 +43,6 @@ end
 ```
 
 Run `mix deps.get` to install it.
-
-## Configuration
 
 Some providers may need to initialize applications to function correctly. The providers will be explicit about whether they need to be loaded at startup or not. `GcpSecretsManager` unlike `SystemEnvironment` is one such example. To load the provider you need to configure it like so. **Note:**  does not need to be loaded at startup.
 
