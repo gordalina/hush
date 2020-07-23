@@ -27,7 +27,7 @@ Hush resolves configuration from using providers, it ships with a `SystemEnviron
 
 | Provider | Description | Link |
 | -------- | ----------- | ---- |
-| `SystemEnvironment` | Read environmental variables | |
+| `SystemEnvironment` | Reads environmental variables. | |
 | `GcpSecretManager` | Load secrets from Google Cloud Platform's [Secret Manager](https://cloud.google.com/secret-manager). | [GitHub](https://github.com/gordalina/hush_gcp_secret_manager) |
 
 ## Installation
@@ -44,7 +44,7 @@ end
 
 Run `mix deps.get` to install it.
 
-Some providers may need to initialize applications to function correctly. The providers will be explicit about whether they need to be loaded at startup or not. `GcpSecretsManager` unlike `SystemEnvironment` is one such example. To load the provider you need to configure it like so. **Note:**  does not need to be loaded at startup.
+Some providers may need to initialize applications to function correctly. The providers will be explicit about whether they need to be loaded at startup or not. `GcpSecretsManager` unlike `SystemEnvironment` is one such example. To load the provider you need to configure it like so. **Note:** `SystemEnvironment` does not need to be loaded at startup.
 
 ```elixir
 # config/config.exs
@@ -86,7 +86,7 @@ def project do
   end
 ```
 
-If you are using Hush in both release and non-release mode, you still want to load it directly, but only in non-release mode:
+If you are using Hush in runtime and release mode, make sure to only resolve configuration in non release mode:
 
 ```elixir
 # application.ex
@@ -104,17 +104,16 @@ Hush will resolve any tuple in the following format into a value.
 {:hush, Hush.Provider, "key", options \\ []}
 ```
 
-`Hush.Provider` can be any module that implements its behaviour.
-`"key"` is passed to the provider to retrieve the data.
-`options` is a a Keyword list with the following properties:
-
-- `default: any()` - If the provider can't find the value, hush will return this value
-- `optional: boolean()` - By default, Hush will raise an error if it cannot find a value and there's no default, unless you mark it as `optional`.
-- `cast: :string | :atom | :charlist | :float | :integer | :boolean | :module` - You can ask Hush to cast the value to a Elixir native type.
+- `Hush.Provider` can be any module that implements its behaviour.
+- `"key"` is passed to the provider to retrieve the data.
+- `options` is a a Keyword list with the following properties:
+  - `default: any()` - If the provider can't find the value, hush will return this value
+  - `optional: boolean()` - By default, Hush will raise an error if it cannot find a value and there's no default, unless you mark it as `optional`.
+  - `cast: :string | :atom | :charlist | :float | :integer | :boolean | :module` - You can ask Hush to cast the value to a Elixir native type.
 
 ### Examples
 
-By default if a given `key` is not found by the provider, Hush will raise an error. To prevent this, provide a `default` in the `options` component of the tuple:
+By default if a given `key` is not found by the provider, Hush will raise an error. To prevent this, provide a `default` or `optional: true` in the `options` component of the tuple.
 
 #### Default
 
