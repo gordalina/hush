@@ -4,7 +4,7 @@
 ### release — bump version strings and release package
 ###
 ### Usage:
-###   bump <version>
+###   release <version>
 ###
 ### Options:
 ###   <version>  Package version, in 0.0.0 format.
