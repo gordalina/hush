@@ -32,6 +32,9 @@ defmodule Hush.Resolver do
       {key, rest = [_ | _]}, acc ->
         acc ++ [{key, resolve!(rest)}]
 
+      {key, rest = %{}}, acc ->
+        acc ++ [{key, resolve!(rest) |> Map.new()}]
+
       other, acc ->
         acc ++ [other]
     end)

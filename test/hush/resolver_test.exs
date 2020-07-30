@@ -8,11 +8,18 @@ defmodule Hush.ResolverTest do
   alias Hush.Provider.MockProvider
 
   describe "resolve/1" do
-    test "successfully" do
+    test "with keyword lists" do
       expect(MockProvider, :fetch, fn _ -> {:ok, "bar"} end)
       config = app_config({:hush, MockProvider, "bar"})
 
       assert Resolver.resolve(config) == {:ok, [{:app, [foo: "bar"]}]}
+    end
+
+    test "with map" do
+      expect(MockProvider, :fetch, fn _ -> {:ok, "map"} end)
+      config = app_config(%{key: {:hush, MockProvider, "map"}})
+
+      assert Resolver.resolve(config) == {:ok, [{:app, [foo: %{key: "map"}]}]}
     end
 
     test "with missing adapter" do
