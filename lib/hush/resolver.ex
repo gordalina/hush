@@ -20,7 +20,7 @@ defmodule Hush.Resolver do
   @doc """
   Substitute {:hush, Hush.Provider, "key", [options]} present in the the config argument
   """
-  @spec resolve!(Keyword.t()) :: Keyword.t()
+  @spec resolve!(Keyword.t() | map) :: Keyword.t()
   def resolve!(config) do
     Enum.reduce(config, [], fn
       {key, {:hush, provider, name}}, acc ->
@@ -30,10 +30,10 @@ defmodule Hush.Resolver do
         acc ++ [{key, resolve_value!(key, provider, name, options)}]
 
       {key, rest = [_ | _]}, acc ->
-        acc ++ [{key, resolve!(rest)}]
+        acc ++ [{key, rest |> resolve!()}]
 
       {key, rest = %{}}, acc ->
-        acc ++ [{key, resolve!(rest) |> Map.new()}]
+        acc ++ [{key, rest |> resolve!() |> Map.new()}]
 
       other, acc ->
         acc ++ [other]
