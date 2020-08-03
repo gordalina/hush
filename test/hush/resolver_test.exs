@@ -22,6 +22,27 @@ defmodule Hush.ResolverTest do
       assert Resolver.resolve(config) == {:ok, [{:app, [foo: %{key: "map"}]}]}
     end
 
+    test "with keyword list" do
+      expect(MockProvider, :fetch, fn _ -> {:ok, "list"} end)
+      config = app_config(key: {:hush, MockProvider, "list"})
+
+      assert Resolver.resolve(config) == {:ok, [{:app, [foo: [key: "list"]]}]}
+    end
+
+    test "with list" do
+      expect(MockProvider, :fetch, fn _ -> {:ok, "list"} end)
+      config = app_config([{:hush, MockProvider, "list"}])
+
+      assert Resolver.resolve(config) == {:ok, [{:app, [foo: ["list"]]}]}
+    end
+
+    test "with tuple" do
+      expect(MockProvider, :fetch, fn _ -> {:ok, "tuple"} end)
+      config = app_config({{:hush, MockProvider, "tuple"}})
+
+      assert Resolver.resolve(config) == {:ok, [{:app, [foo: {"tuple"}]}]}
+    end
+
     test "with missing adapter" do
       config = [
         {:app, [foo: {:hush, ThisModuleDoesNotExist, "bar"}]}
@@ -31,7 +52,7 @@ defmodule Hush.ResolverTest do
                {:error,
                 %RuntimeError{
                   message:
-                    "An error occured while trying to resolve value in provider: Elixir.ThisModuleDoesNotExist.\nProvider is not available (nofile)"
+                    "An error occured in the provider while trying to resolve {:hush, Elixir.ThisModuleDoesNotExist, \"bar\"}: Provider is not available (nofile)"
                 }}
     end
 
@@ -43,7 +64,7 @@ defmodule Hush.ResolverTest do
                {:error,
                 %ArgumentError{
                   message:
-                    "Could not resolve 'foo'. I was trying to evaluate 'HUSH_UNKNOWN' with Elixir.Hush.Provider.MockProvider. If this is an optional key, you add `optional: true` to the options list."
+                    "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"HUSH_UNKNOWN\"}. If this is an optional key, you add `optional: true` to the options list."
                 }}
     end
 
@@ -55,7 +76,7 @@ defmodule Hush.ResolverTest do
                {:error,
                 %ArgumentError{
                   message:
-                    "Although I was able to resolve configuration 'foo', I wasn't able to cast it to type 'integer'."
+                    "Although I was able to resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}, I wasn't able to cast it to type 'integer'."
                 }}
     end
 
@@ -67,7 +88,7 @@ defmodule Hush.ResolverTest do
                {:error,
                 %RuntimeError{
                   message:
-                    "An error occured while trying to resolve value in provider: Elixir.Hush.Provider.MockProvider.\nProvider returned an unexpected value: wrong return.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"error\"}"
+                    "An error occured in the provider while trying to resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Provider returned an unexpected value: wrong return.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"error\"}"
                 }}
     end
   end
