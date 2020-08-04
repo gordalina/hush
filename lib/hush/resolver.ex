@@ -52,7 +52,8 @@ defmodule Hush.Resolver do
     type = Keyword.get(options, :cast, :string)
 
     with {:ok, value} <- Provider.fetch(provider, name, options),
-         {:ok, value} <- Cast.to(type, value) do
+         {:ok, value} <- Cast.to(type, value),
+         {:ok, value} <- to_file?(provider, name, options, value) do
       value
     else
       {:error, :required} ->
@@ -73,6 +74,21 @@ defmodule Hush.Resolver do
             "An error occured in the provider while trying to resolve {:hush, #{provider}, #{
               inspect(name)
             }}: #{error}"
+    end
+  end
+
+  # sobelow_skip ["Traversal.FileModule"]
+  @spec to_file?(module(), String.t(), Keyword.t(), any()) ::
+          {:ok, String.t()} | {:error, String.t()}
+  defp to_file?(_provider, _name, options, value) do
+    case Keyword.get(options, :to_file, nil) do
+      nil ->
+        {:ok, value}
+
+      file ->
+        with :ok <- File.write(file, value) do
+          {:ok, file}
+        end
     end
   end
 end

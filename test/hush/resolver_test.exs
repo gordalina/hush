@@ -50,6 +50,16 @@ defmodule Hush.ResolverTest do
       assert Resolver.resolve(config) == {:ok, [{:app, [foo: %Config.Provider{}]}]}
     end
 
+    test "into file" do
+      expect(MockProvider, :fetch, fn _ -> {:ok, "contents"} end)
+
+      file = Path.join(System.tmp_dir!(), "__#{:rand.uniform(100_000_000)}")
+      config = app_config({:hush, MockProvider, "contents", to_file: file})
+
+      assert Resolver.resolve(config) == {:ok, [{:app, [foo: file]}]}
+      assert File.read!(file) == "contents"
+    end
+
     test "with missing adapter" do
       config = [
         {:app, [foo: {:hush, ThisModuleDoesNotExist, "bar"}]}
