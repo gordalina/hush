@@ -33,7 +33,11 @@ defmodule Hush.Resolver do
         acc ++ [rest |> resolve!()]
 
       rest, acc when is_map(rest) ->
-        acc ++ [rest |> resolve!() |> Map.new()]
+        if Enumerable.impl_for(rest) != nil do
+          acc ++ [rest |> resolve!() |> Map.new()]
+        else
+          acc ++ [rest]
+        end
 
       rest, acc when is_tuple(rest) ->
         acc ++ [Tuple.to_list(rest) |> resolve!() |> List.to_tuple()]

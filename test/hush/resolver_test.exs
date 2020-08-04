@@ -43,6 +43,13 @@ defmodule Hush.ResolverTest do
       assert Resolver.resolve(config) == {:ok, [{:app, [foo: {"tuple"}]}]}
     end
 
+    test "with custom struct" do
+      expect(MockProvider, :fetch, fn _ -> {:ok, "tuple"} end)
+
+      config = app_config(%Config.Provider{})
+      assert Resolver.resolve(config) == {:ok, [{:app, [foo: %Config.Provider{}]}]}
+    end
+
     test "with missing adapter" do
       config = [
         {:app, [foo: {:hush, ThisModuleDoesNotExist, "bar"}]}
