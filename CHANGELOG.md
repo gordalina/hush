@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.2
+
+- Add `to_file: String.t()` as an option to pipe secret data into a file.
+
 ## v0.3.1
 
 - Bug: Traversing non-iterable structs trips the resolver when running as Config.Provider
