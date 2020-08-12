@@ -77,18 +77,8 @@ defmodule Hush.Resolver do
     end
   end
 
-  # sobelow_skip ["Traversal.FileModule"]
-  @spec to_file?(module(), String.t(), Keyword.t(), any()) ::
-          {:ok, String.t()} | {:error, String.t()}
-  defp to_file?(_provider, _name, options, value) do
-    case Keyword.get(options, :to_file, nil) do
-      nil ->
         {:ok, value}
 
-      file ->
-        with :ok <- File.write(file, value) do
-          {:ok, file}
-        end
     end
   end
 end
