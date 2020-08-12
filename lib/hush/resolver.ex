@@ -22,34 +22,41 @@ defmodule Hush.Resolver do
   """
   @spec resolve!(Keyword.t() | map) :: Keyword.t()
   def resolve!(config) do
-    Enum.reduce(config, [], fn
-      {:hush, provider, name}, acc ->
-        acc ++ [resolve_value!(provider, name, [])]
-
-      {:hush, provider, name, options}, acc ->
-        acc ++ [resolve_value!(provider, name, options)]
-
-      rest, acc when is_list(rest) ->
-        acc ++ [rest |> resolve!()]
-
-      rest, acc when is_map(rest) ->
-        if Enumerable.impl_for(rest) != nil do
-          acc ++ [rest |> resolve!() |> Map.new()]
-        else
-          acc ++ [rest]
-        end
-
-      rest, acc when is_tuple(rest) ->
-        acc ++ [Tuple.to_list(rest) |> resolve!() |> List.to_tuple()]
-
-      other, acc ->
-        acc ++ [other]
-    end)
+    Enum.reduce(config, [], &reducer/2)
   end
 
-  @spec resolve_value!(module(), String.t(), Keyword.t()) :: any()
-  defp resolve_value!(provider, name, options) do
-    case resolve_value(provider, name, options) do
+  @spec reducer(any(), Keyword.t()) :: Keyword.t()
+  defp reducer({:hush, provider, name}, acc) do
+    acc ++ [value!(provider, name, [])]
+  end
+
+  defp reducer({:hush, provider, name, options}, acc) do
+    acc ++ [value!(provider, name, options)]
+  end
+
+  defp reducer(rest, acc) when is_list(rest) do
+    acc ++ [rest |> resolve!()]
+  end
+
+  defp reducer(rest, acc) when is_map(rest) do
+    if Enumerable.impl_for(rest) != nil do
+      acc ++ [rest |> resolve!() |> Map.new()]
+    else
+      acc ++ [rest]
+    end
+  end
+
+  defp reducer(rest, acc) when is_tuple(rest) do
+    acc ++ [Tuple.to_list(rest) |> resolve!() |> List.to_tuple()]
+  end
+
+  defp reducer(other, acc) do
+    acc ++ [other]
+  end
+
+  @spec value!(module(), String.t(), Keyword.t()) :: any()
+  defp value!(provider, name, options) do
+    case value(provider, name, options) do
       {:ok, value} ->
         value
 
@@ -59,15 +66,13 @@ defmodule Hush.Resolver do
     end
   end
 
-  defp resolve_value(provider, name, options) do
+  @spec value(module(), String.t(), Keyword.t()) :: {:ok, any()} | {:error, String.t()}
+  defp value(provider, name, options) do
     try do
       with {:ok, value} <- Provider.fetch(provider, name, options),
            {:ok, value} <- Transformer.apply(options, value) do
         {:ok, value}
       else
-        {:error, :cast} ->
-          {:error, "cast error"}
-
         {:error, :required} ->
           {:error,
            "The provider couldn't find a value for this key. If this is an optional key, you add `optional: true` to the options list."}
