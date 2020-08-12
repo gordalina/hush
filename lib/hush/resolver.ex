@@ -3,7 +3,7 @@ defmodule Hush.Resolver do
   Replace configuration sugin provider-aware resolvers.
   """
 
-  alias Hush.{Cast, Provider}
+  alias Hush.{Provider, Transformer}
 
   @doc """
   Substitute {:hush, Hush.Provider, "key", [options]} present in the the config argument.
@@ -13,7 +13,7 @@ defmodule Hush.Resolver do
     try do
       {:ok, resolve!(config)}
     rescue
-      err -> {:error, err}
+      err -> {:error, err.message}
     end
   end
 
@@ -49,36 +49,35 @@ defmodule Hush.Resolver do
 
   @spec resolve_value!(module(), String.t(), Keyword.t()) :: any()
   defp resolve_value!(provider, name, options) do
-    type = Keyword.get(options, :cast, :string)
-
-    with {:ok, value} <- Provider.fetch(provider, name, options),
-         {:ok, value} <- Cast.to(type, value),
-         {:ok, value} <- to_file?(provider, name, options, value) do
-      value
-    else
-      {:error, :required} ->
-        raise ArgumentError,
-          message:
-            "Could not resolve {:hush, #{provider}, #{inspect(name)}}. If this is an optional key, you add `optional: true` to the options list."
-
-      {:error, :cast} ->
-        raise ArgumentError,
-          message:
-            "Although I was able to resolve {:hush, #{provider}, #{inspect(name)}}, I wasn't able to cast it to type '#{
-              type
-            }'."
+    case resolve_value(provider, name, options) do
+      {:ok, value} ->
+        value
 
       {:error, error} ->
         raise RuntimeError,
-          message:
-            "An error occured in the provider while trying to resolve {:hush, #{provider}, #{
-              inspect(name)
-            }}: #{error}"
+          message: "Could not resolve {:hush, #{provider}, #{inspect(name)}}: #{error}"
     end
   end
 
+  defp resolve_value(provider, name, options) do
+    try do
+      with {:ok, value} <- Provider.fetch(provider, name, options),
+           {:ok, value} <- Transformer.apply(options, value) do
         {:ok, value}
+      else
+        {:error, :cast} ->
+          {:error, "cast error"}
 
+        {:error, :required} ->
+          {:error,
+           "The provider couldn't find a value for this key. If this is an optional key, you add `optional: true` to the options list."}
+
+        {:error, error} ->
+          {:error, error}
+      end
+    rescue
+      error ->
+        {:error, error.message}
     end
   end
 end

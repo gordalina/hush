@@ -60,53 +60,53 @@ defmodule Hush.ResolverTest do
       assert File.read!(file) == "contents"
     end
 
+    test "with provider exception" do
+      expect(MockProvider, :fetch, fn _ -> raise "error" end)
+      config = app_config({:hush, MockProvider, "key"})
+
+      error = "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"key\"}: error"
+      assert {:error, error} == Resolver.resolve(config)
+    end
+
     test "with missing adapter" do
       config = [
         {:app, [foo: {:hush, ThisModuleDoesNotExist, "bar"}]}
       ]
 
-      assert Resolver.resolve(config) ==
-               {:error,
-                %RuntimeError{
-                  message:
-                    "An error occured in the provider while trying to resolve {:hush, Elixir.ThisModuleDoesNotExist, \"bar\"}: Provider is not available (nofile)"
-                }}
+      error =
+        "Could not resolve {:hush, Elixir.ThisModuleDoesNotExist, \"bar\"}: Provider is not available (nofile)"
+
+      assert {:error, error} == Resolver.resolve(config)
     end
 
     test "with required error" do
       expect(MockProvider, :fetch, fn _ -> {:error, :not_found} end)
       config = app_config({:hush, MockProvider, "HUSH_UNKNOWN"})
 
-      assert Resolver.resolve(config) ==
-               {:error,
-                %ArgumentError{
-                  message:
-                    "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"HUSH_UNKNOWN\"}. If this is an optional key, you add `optional: true` to the options list."
-                }}
+      error =
+        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"HUSH_UNKNOWN\"}: The provider couldn't find a value for this key. If this is an optional key, you add `optional: true` to the options list."
+
+      assert {:error, error} == Resolver.resolve(config)
     end
 
     test "with cast error" do
       expect(MockProvider, :fetch, fn _ -> {:ok, "bar"} end)
       config = app_config({:hush, MockProvider, "bar", cast: :integer})
 
-      assert Resolver.resolve(config) ==
-               {:error,
-                %ArgumentError{
-                  message:
-                    "Although I was able to resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}, I wasn't able to cast it to type 'integer'."
-                }}
+      error =
+        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Couldn't cast to type integer due to argument error"
+
+      assert {:error, error} == Resolver.resolve(config)
     end
 
     test "with general error" do
       expect(MockProvider, :fetch, fn _ -> "wrong return" end)
       config = app_config({:hush, MockProvider, "bar"})
 
-      assert Resolver.resolve(config) ==
-               {:error,
-                %RuntimeError{
-                  message:
-                    "An error occured in the provider while trying to resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Provider returned an unexpected value: wrong return.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"error\"}"
-                }}
+      error =
+        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Provider returned an unexpected value: wrong return.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"error\"}"
+
+      assert {:error, error} == Resolver.resolve(config)
     end
   end
 
