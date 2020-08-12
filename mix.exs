@@ -42,8 +42,7 @@ defmodule Hush.MixProject do
       {:dialyxir, "~> 1.0.0", only: :dev, runtime: false},
       {:sobelow, "~> 0.10.3", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.12", only: [:test]},
-      {:inch_ex, "~> 2.0.0", only: :docs}
+      {:excoveralls, "~> 0.12", only: :test, runtime: false}
     ]
   end
 
