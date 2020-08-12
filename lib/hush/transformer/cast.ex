@@ -1,28 +1,27 @@
-defmodule Hush.Cast do
+defmodule Hush.Transformer.Cast do
   @moduledoc """
-  Utility functions to cast `String`s to Elixir native types
+  Utility functions to cast strings to Elixir native types
   """
 
-  @type type_atom :: :string | :atom | :charlist | :float | :integer | :boolean | :module
-  @type type_native ::
-          String.t() | atom() | charlist() | float() | integer() | boolean() | module()
+  @behaviour Hush.Transformer
 
-  @doc """
-  Cast a string to any type.
-  Returns an {:error, :cast} tuple on failure
-  """
-  @spec to(type_atom, String.t()) :: {:ok, type_native} | {:error, :cast, type_atom}
-  def to(type, value) do
+  @impl true
+  @spec key() :: :cast
+  def key(), do: :cast
+
+  @impl true
+  @spec transform(config :: any(), value :: any()) :: {:ok, any()} | {:error, String.t()}
+  def transform(type, value) do
     try do
       {:ok, to!(type, value)}
     rescue
-      _ -> {:error, :cast}
+      error -> {:error, "Couldn't cast to type #{type} due to #{error.message}"}
     end
   end
 
   @doc """
   Cast a string to any type.
-  An error is returned on failure.
+  An error is raised on failure.
   """
   @spec to!(:string, String.t()) :: String.t()
   def to!(:string, value), do: value

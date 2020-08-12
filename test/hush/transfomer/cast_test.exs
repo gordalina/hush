@@ -1,15 +1,22 @@
-defmodule Hush.CastTest do
+defmodule Hush.Transformer.CastTest do
   use ExUnit.Case
-  doctest Hush.Cast
-  alias Hush.Cast
+  doctest Hush.Transformer.Cast
+  alias Hush.Transformer.Cast
 
-  describe "to/2" do
+  describe "key/0" do
     test "ok" do
-      assert {:ok, 1} == Cast.to(:integer, "1")
+      assert :cast == Cast.key()
+    end
+  end
+
+  describe "transform/2" do
+    test "ok" do
+      assert {:ok, 1} == Cast.transform(:integer, "1")
     end
 
     test "fail" do
-      assert {:error, :cast} == Cast.to(:integer, "foo")
+      error = "Couldn't cast to type integer due to argument error"
+      assert {:error, error} == Cast.transform(:integer, "foo")
     end
   end
 
