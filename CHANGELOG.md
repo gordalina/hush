@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## v0.4.0
 
 - Add Transformers to mutate data in runtime.
 
