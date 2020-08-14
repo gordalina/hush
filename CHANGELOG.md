@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+- Add Transformers to mutate data in runtime.
+
 ## v0.3.2
 
 - Add `to_file: String.t()` as an option to pipe secret data into a file.

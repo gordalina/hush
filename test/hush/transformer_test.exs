@@ -22,6 +22,23 @@ defmodule Hush.TransformerTest do
       assert {:ok, 1} == Transformer.apply([mock: true], "1")
     end
 
+    test "override?/0 false" do
+      expect(MockTransformer, :key, fn -> :mock end)
+      expect(MockTransformer, :transform, fn _, _ -> {:ok, 1} end)
+      assert {:ok, 1} == Transformer.apply([mock: true], "1")
+    end
+
+    test "override?/0 true" do
+      Application.put_env(:hush, :transformers_override, true)
+      Application.put_env(:hush, :transformers, [])
+
+      expect(MockTransformer, :key, fn -> :mock end)
+      expect(MockTransformer, :transform, fn _, _ -> {:ok, 1} end)
+      assert {:ok, "1"} == Transformer.apply([mock: true, cast: :integer], "1")
+
+      Application.put_env(:hush, :transformers_override, false)
+    end
+
     test "fail with error message" do
       expect(MockTransformer, :key, fn -> :mock end)
       expect(MockTransformer, :transform, fn _, _ -> raise "error" end)

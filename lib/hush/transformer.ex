@@ -37,6 +37,14 @@ defmodule Hush.Transformer do
   end
 
   defp transformers() do
-    Application.get_env(:hush, :transformers, @transformers)
+    if override?() do
+      Application.get_env(:hush, :transformers, [])
+    else
+      @transformers ++ Application.get_env(:hush, :transformers, [])
+    end
+  end
+
+  defp override?() do
+    Application.get_env(:hush, :transformers_override, false)
   end
 end
