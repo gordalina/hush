@@ -10,19 +10,19 @@ defmodule Hush.ProviderTest do
   defmodule EmptyModule do
   end
 
-  describe "is?/1" do
+  describe "valid?/1" do
     test "ok" do
-      assert Provider.is?(MockProvider) == :ok
+      assert Provider.valid?(MockProvider) == :ok
     end
 
     test "unknown module" do
       msg = "Provider is not available (nofile)"
-      assert Provider.is?(ThisModuleDoesNotExist) == {:error, msg}
+      assert Provider.valid?(ThisModuleDoesNotExist) == {:error, msg}
     end
 
     test "not a provider" do
       msg = "Provider's fetch/1 is undefined"
-      assert Provider.is?(EmptyModule) == {:error, msg}
+      assert Provider.valid?(EmptyModule) == {:error, msg}
     end
   end
 
