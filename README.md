@@ -28,11 +28,11 @@ config :app, App.RedshiftRepo,
 
 Hush resolves configuration from using providers, it ships with a `SystemEnvironment` provider which reads environmental variables, but multiple providers exist. You can also [write your own easily](#writing-your-own-provider).
 
-| Provider            | Description                                                                                          | Link                                                            |
-| ------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `SystemEnvironment` | Reads environmental variables.                                                                       |                                                                 |
-| `AwsSecretsManager` | Load secrets from Amazon Web Services's [Secrets Manager](https://aws.amazon.com/secrets-manager/).  | [GitHub](https://github.com/gordalina/hush_aws_secrets_manager) |
-| `GcpSecretManager`  | Load secrets from Google Cloud Platform's [Secret Manager](https://cloud.google.com/secret-manager). | [GitHub](https://github.com/gordalina/hush_gcp_secret_manager)  |
+| Provider            | Description                                                                               | Link                                                            |
+| ------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `SystemEnvironment` | Reads environmental variables.                                                            |                                                                 |
+| `AwsSecretsManager` | Load secrets from [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/).         | [GitHub](https://github.com/gordalina/hush_aws_secrets_manager) |
+| `GcpSecretManager`  | Load secrets from [Google Cloud Secret Manager](https://cloud.google.com/secret-manager). | [GitHub](https://github.com/gordalina/hush_gcp_secret_manager)  |
 
 ## Installation
 
