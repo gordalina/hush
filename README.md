@@ -14,21 +14,25 @@ Hush can be used to inject configuration that is not known at compile time, such
 
 ```elixir
 # config/prod.exs
-alias Hush.Provider.{GcpSecretManager,SystemEnvironment}
+alias Hush.Provider.{AwsSecretsManager, GcpSecretManager,SystemEnvironment}
 
 config :app, Web.Endpoint,
   http: [port: {:hush, SystemEnvironment, "PORT", [cast: :integer]}]
 
 config :app, App.Repo,
   password: {:hush, GcpSecretManager, "CLOUDSQL_PASSWORD"}
+
+config :app, App.RedshiftRepo,
+  password: {:hush, AwsSecretsManager, "REDSHIFT_PASSWORD"}
 ```
 
 Hush resolves configuration from using providers, it ships with a `SystemEnvironment` provider which reads environmental variables, but multiple providers exist. You can also [write your own easily](#writing-your-own-provider).
 
-| Provider | Description | Link |
-| -------- | ----------- | ---- |
-| `SystemEnvironment` | Reads environmental variables. | |
-| `GcpSecretManager` | Load secrets from Google Cloud Platform's [Secret Manager](https://cloud.google.com/secret-manager). | [GitHub](https://github.com/gordalina/hush_gcp_secret_manager) |
+| Provider            | Description                                                                                          | Link                                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `SystemEnvironment` | Reads environmental variables.                                                                       |                                                                 |
+| `AwsSecretsManager` | Load secrets from Amazon Web Services's [Secrets Manager](https://aws.amazon.com/secrets-manager/).  | [GitHub](https://github.com/gordalina/hush_aws_secrets_manager) |
+| `GcpSecretManager`  | Load secrets from Google Cloud Platform's [Secret Manager](https://cloud.google.com/secret-manager). | [GitHub](https://github.com/gordalina/hush_gcp_secret_manager)  |
 
 ## Installation
 
@@ -59,7 +63,7 @@ config :hush,
 
 Hush can be loaded in two ways, at runtime in your application, or as a [Config.Provider](https://hexdocs.pm/elixir/Config.Provider.html) in release mode.
 
-**Loading at runtime**
+### Loading at runtime
 
 ```elixir
 # application.ex
@@ -69,7 +73,7 @@ def start(_type, _args) do
 end
 ```
 
-**Loading via in release mode**
+### Loading via in release mode
 
 To load hush as a config provider, you need to define in your `releases` in `mix.exs`.
 
