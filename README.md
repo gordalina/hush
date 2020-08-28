@@ -61,7 +61,7 @@ config :hush,
 
 ## Usage
 
-Hush can be loaded in two ways, at runtime in your application, or as a [Config.Provider](https://hexdocs.pm/elixir/Config.Provider.html) in release mode.
+Hush can be loaded in two ways, at runtime in your application, or as a [Config.Provider](https://hexdocs.pm/elixir/Config.Provider.html) in release mode. A [sample app](https://github.com/gordalina/hush_sample_app) has been written so you can see how it's configured.
 
 ### Loading at runtime
 
