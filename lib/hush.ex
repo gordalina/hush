@@ -20,9 +20,6 @@ defmodule Hush do
     config |> Enum.map(&resolve!(&1))
   end
 
-  @doc """
-  Resolve a {app, [config]} tuple
-  """
   @spec resolve!({atom(), Keyword.t()}) :: {atom(), Keyword.t()}
   def resolve!({app, config}) do
     with config <- Hush.Resolver.resolve!(config),
