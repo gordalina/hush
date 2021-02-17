@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/gordalina/hush/badge.svg?branch=master)](https://coveralls.io/r/gordalina/hush?branch=master)
 [![hex.pm version](https://img.shields.io/hexpm/v/hush.svg)](https://hex.pm/packages/hush)
 
-Hush makes it easy to configure your application at runtime and in release mode, it can retrieve data from multiple sources and set it in your application configuration automatically.
+Hush is designed to help developers configure their applications at runtime and in release mode, retrieving configuration from multiple providers, without having to depend on secret files or hardcoded configuration.
 
 Documentation can be found at [https://hexdocs.pm/hush](https://hexdocs.pm/hush).
 
