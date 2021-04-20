@@ -41,7 +41,7 @@ Add `hush` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:hush, "~> 0.4.0"}
+    {:hush, "~> 0.4.1"}
   ]
 end
 ```
