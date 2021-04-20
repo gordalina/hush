@@ -53,9 +53,11 @@ Some providers may need to initialize applications to function correctly. The pr
 ```elixir
 # config/config.exs
 
+alias Hush.Providers.GcpSecretManager
+
 config :hush,
   providers: [
-    GcpSecretsManager
+    GcpSecretManager
   ]
 ```
 
