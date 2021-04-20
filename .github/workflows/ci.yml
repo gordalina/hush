@@ -113,4 +113,6 @@ jobs:
           mix local.hex --force
           mix deps.get
       - name: Release
-        run: mix hex.publish --yes
+        run: |
+          mix hex.publish --yes
+          mix hex.publish docs --yes
