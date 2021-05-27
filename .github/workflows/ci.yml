@@ -26,6 +26,8 @@ jobs:
             elixir: 1.10.3
           - otp: 23.1
             elixir: 1.11.2
+          - otp: 24.0
+            elixir: 1.12.0
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
