@@ -15,14 +15,21 @@ defmodule Hush.Transformer.CastTest do
     end
 
     test "fail" do
-      error = "Couldn't cast to type integer due to argument error"
-      assert {:error, error} == Cast.transform(:integer, "foo")
+      {:error, error} = Cast.transform(:integer, "foo")
+
+      message = "Couldn't cast to type integer due to"
+      assert String.starts_with?(error, message)
     end
   end
 
   describe "to!/2" do
     test "failure" do
       assert_raise ArgumentError, fn -> Cast.to!(:integer, "foo") end
+      assert_raise ArgumentError, fn -> Cast.to!(:float, "foo") end
+      assert_raise ArgumentError, fn -> Cast.to!(:boolean, "not_existing_atom") end
+      assert_raise ArgumentError, fn -> Cast.to!(:string, Error) end
+      assert_raise ArgumentError, fn -> Cast.to!(:atom, "not_existing_atom") end
+      assert_raise ArgumentError, fn -> Cast.to!(:charlist, false) end
     end
 
     test ":string", do: assert("bar" = Cast.to!(:string, "bar"))

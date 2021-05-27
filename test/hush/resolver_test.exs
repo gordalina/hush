@@ -93,10 +93,10 @@ defmodule Hush.ResolverTest do
       expect(MockProvider, :fetch, fn _ -> {:ok, "bar"} end)
       config = app_config({:hush, MockProvider, "bar", cast: :integer})
 
-      error =
-        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Couldn't cast to type integer due to argument error"
+      {:error, error} = Resolver.resolve(config)
 
-      assert {:error, error} == Resolver.resolve(config)
+      message = "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}"
+      assert String.starts_with?(error, message)
     end
 
     test "with general error" do

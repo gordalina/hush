@@ -23,6 +23,10 @@ defmodule Hush.Transformer.Cast do
   Cast a string to any type.
   An error is raised on failure.
   """
+  def to!(_, value) when not is_binary(value) do
+    raise(ArgumentError, message: "Input is not a string")
+  end
+
   @spec to!(:string, String.t()) :: String.t()
   def to!(:string, value), do: value
 
