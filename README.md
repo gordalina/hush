@@ -14,13 +14,13 @@ Hush can be used to inject configuration that is not known at compile time, such
 
 ```elixir
 # config/prod.exs
-alias Hush.Provider.{AwsSecretsManager, GcpSecretManager,SystemEnvironment}
+alias Hush.Provider.{AwsSecretsManager, GcpSecretManager, SystemEnvironment}
 
 config :app, Web.Endpoint,
   http: [port: {:hush, SystemEnvironment, "PORT", [cast: :integer]}]
 
-config :app, App.Repo,
-  password: {:hush, GcpSecretManager, "CLOUDSQL_PASSWORD"}
+config :app, App,
+  cdn_url: {:hush, GcpSecretManager, "CDN_DOMAIN", [apply: &{:ok, "https://" <> &1}]}
 
 config :app, App.RedshiftRepo,
   password: {:hush, AwsSecretsManager, "REDSHIFT_PASSWORD"}
@@ -41,7 +41,7 @@ Add `hush` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:hush, "~> 0.4.1"}
+    {:hush, "~> 0.5.0"}
   ]
 end
 ```
@@ -115,6 +115,7 @@ Hush will resolve any tuple in the following format into a value.
 - `options` is a a Keyword list with the following properties:
   - `default: any()` - If the provider can't find the value, hush will return this value
   - `optional: boolean()` - By default, Hush will raise an error if it cannot find a value and there's no default, unless you mark it as `optional`.
+  - `apply: fun(any()) :: {:ok, any()} | {:error, String.t()}` - Apply a function to the value resolved by Hush.
   - `cast: :string | :atom | :charlist | :float | :integer | :boolean | :module` - You can ask Hush to cast the value to a Elixir native type.
   - `to_file: string()` - Write the data to the path give in `to_file()` and return the path.
 
