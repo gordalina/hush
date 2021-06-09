@@ -10,6 +10,7 @@ defmodule Hush.Transformer do
               {:ok, any()} | {:error, atom() | String.t()}
 
   @transformers [
+    Hush.Transformer.Apply,
     Hush.Transformer.Cast,
     Hush.Transformer.ToFile
   ]
