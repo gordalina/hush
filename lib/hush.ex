@@ -4,16 +4,16 @@ defmodule Hush do
   """
 
   @doc """
-  Resolve configuration of all loaded applications
+  Resolve configuration
+
+  When called with resolve!/0 it will default to all loaded applications' configuration.
+  When called with resolve!/1 with the configuration as an arugment it will process that.
   """
   @spec resolve!() :: Keyword.t()
   def resolve!() do
     runtime_config() |> resolve!()
   end
 
-  @doc """
-  Resolve configuration passed as an argument
-  """
   @spec resolve!(Keyword.t()) :: Keyword.t()
   def resolve!(config) when is_list(config) do
     config |> load_providers!()
