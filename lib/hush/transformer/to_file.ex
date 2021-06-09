@@ -1,6 +1,6 @@
 defmodule Hush.Transformer.ToFile do
   @moduledoc """
-  Write out
+  File writer transformer
   """
 
   @behaviour Hush.Transformer
