@@ -36,13 +36,13 @@ defmodule Hush.MixProject do
 
   defp deps do
     [
-      {:mox, "~> 0.5", only: :test},
-      {:credo, "~> 1.4.0", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.0.0", only: :dev, runtime: false},
-      {:ex_check, "~> 0.12.0", only: :dev, runtime: false},
-      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.12", only: :test, runtime: false},
-      {:sobelow, "~> 0.10.3", only: :dev, runtime: false}
+      {:mox, "~> 1.0", only: :test},
+      {:credo, "~> 1.6", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.1", only: :dev, runtime: false},
+      {:ex_check, "~> 0.13", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.14", only: :test, runtime: false},
+      {:sobelow, "~> 0.11", only: :dev, runtime: false}
     ]
   end
 
