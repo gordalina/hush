@@ -30,7 +30,7 @@ jobs:
             elixir: 1.12.3
           - otp: 25.0
             elixir: 1.13.4
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
@@ -49,12 +49,12 @@ jobs:
 
   checks:
     name: static checks
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         include:
-          - otp: 24.0
-            elixir: 1.12.0
+          - otp: 25.0
+            elixir: 1.13.4
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
@@ -73,12 +73,12 @@ jobs:
 
   docs:
     name: docs
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         include:
-          - otp: 24.0
-            elixir: 1.12.0
+          - otp: 25.0
+            elixir: 1.13.4
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
@@ -99,9 +99,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - otp: 24.0
-            elixir: 1.12.0
-    runs-on: ubuntu-22.04
+          - otp: 25.0
+            elixir: 1.13.4
+    runs-on: ubuntu-20.04
     needs: [test, checks, docs]
     env:
       HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
