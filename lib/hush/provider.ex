@@ -26,7 +26,7 @@ defmodule Hush.Provider do
 
       unexpected ->
         {:error,
-         "Provider returned an unexpected value: #{unexpected}.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"string\"}"}
+         "Provider returned an unexpected value: #{inspect(unexpected)}.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"string\"}"}
     end
   end
 

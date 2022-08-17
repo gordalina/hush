@@ -114,7 +114,7 @@ defmodule Hush.ResolverTest do
       config = app_config({:hush, MockProvider, "bar"})
 
       error =
-        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Provider returned an unexpected value: wrong return.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"string\"}"
+        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Provider returned an unexpected value: \"wrong return\".\nExpected {:ok, value}, {:error, :not_found} or {:error, \"string\"}"
 
       assert {:error, error} == Resolver.resolve(config)
     end

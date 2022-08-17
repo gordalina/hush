@@ -13,7 +13,8 @@ defmodule Hush.Resolver do
     try do
       {:ok, resolve!(config)}
     rescue
-      err -> {:error, err.message}
+      e in RuntimeError -> {:error, e.message}
+      e -> {:error, inspect(e)}
     end
   end
 
@@ -61,8 +62,6 @@ defmodule Hush.Resolver do
         value
 
       {:error, error} ->
-        error = if is_binary(error), do: error, else: inspect(error)
-
         raise RuntimeError,
           message: "Could not resolve {:hush, #{provider}, #{inspect(name)}}: #{error}"
     end
@@ -79,8 +78,11 @@ defmodule Hush.Resolver do
           {:error,
            "The provider couldn't find a value for this key. If this is an optional key, you add `optional: true` to the options list."}
 
-        {:error, error} ->
+        {:error, error} when is_binary(error) ->
           {:error, error}
+
+        {:error, error} ->
+          {:error, inspect(error)}
       end
     rescue
       error ->
