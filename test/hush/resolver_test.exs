@@ -68,6 +68,16 @@ defmodule Hush.ResolverTest do
       assert {:error, error} == Resolver.resolve(config)
     end
 
+    test "with provider error" do
+      expect(MockProvider, :fetch, fn _ -> {:error, %{error: "error"}} end)
+      config = app_config({:hush, MockProvider, "key"})
+
+      error =
+        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"key\"}: %{error: \"error\"}"
+
+      assert {:error, error} == Resolver.resolve(config)
+    end
+
     test "with missing adapter" do
       config = [
         {:app, [foo: {:hush, ThisModuleDoesNotExist, "bar"}]}
@@ -104,7 +114,7 @@ defmodule Hush.ResolverTest do
       config = app_config({:hush, MockProvider, "bar"})
 
       error =
-        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Provider returned an unexpected value: wrong return.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"error\"}"
+        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Provider returned an unexpected value: wrong return.\nExpected {:ok, value}, {:error, :not_found} or {:error, \"string\"}"
 
       assert {:error, error} == Resolver.resolve(config)
     end

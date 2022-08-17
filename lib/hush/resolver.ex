@@ -61,6 +61,8 @@ defmodule Hush.Resolver do
         value
 
       {:error, error} ->
+        error = if is_binary(error), do: error, else: inspect(error)
+
         raise RuntimeError,
           message: "Could not resolve {:hush, #{provider}, #{inspect(name)}}: #{error}"
     end
