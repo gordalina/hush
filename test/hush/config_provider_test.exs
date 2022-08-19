@@ -1,5 +1,5 @@
 defmodule Hush.ConfigProviderTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   doctest Hush.ConfigProvider
   alias Hush.ConfigProvider
   alias Hush.Provider.MockProvider

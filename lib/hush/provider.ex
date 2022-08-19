@@ -11,16 +11,13 @@ defmodule Hush.Provider do
   @doc """
   Fetch a value from a provider
   """
-  @spec fetch(module(), String.t(), Keyword.t()) ::
+  @spec fetch(module(), String.t()) ::
           {:ok, String.t() | nil} | {:error, :required} | {:error, any()}
-  def fetch(provider, name, options \\ []) do
+  def fetch(provider, name) do
     with :ok <- valid?(provider),
          {:ok, value} <- provider.fetch(name) do
       {:ok, value}
     else
-      {:error, :not_found} ->
-        default_or_error(options)
-
       {:error, error} ->
         {:error, error}
 
@@ -44,23 +41,6 @@ defmodule Hush.Provider do
 
       false ->
         {:error, "Provider's fetch/1 is undefined"}
-    end
-  end
-
-  @spec default_or_error(Keyword.t()) :: {:ok, any()} | {:error, :required} | {:ok, nil}
-  defp default_or_error(options) do
-    cond do
-      # lets get default if it exists
-      Keyword.has_key?(options, :default) ->
-        {:ok, Keyword.get(options, :default)}
-
-      # return nil if optional is set
-      Keyword.get(options, :optional, false) ->
-        {:ok, nil}
-
-      # return error in any other case
-      true ->
-        {:error, :required}
     end
   end
 end

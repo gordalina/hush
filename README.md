@@ -119,6 +119,7 @@ Hush will resolve any tuple in the following format into a value.
   - `apply: fun(any()) :: {:ok, any()} | {:error, String.t()}` - Apply a function to the value resolved by Hush.
   - `cast: :string | :atom | :charlist | :float | :integer | :boolean | :module` - You can ask Hush to cast the value to a Elixir native type.
   - `to_file: string()` - Write the data to the path give in `to_file()` and return the path.
+  - `cache_ttl: integer()` - How long, in seconds, to cache the value from the provider. Defaults to 60 seconds. This overwrites the global hush `cache_ttl` configuration.
 
 After Hush resolves a value it runs them through Transfomers.
 
@@ -174,6 +175,22 @@ assert nil == Application.get_env(:app, :can_be_nil)
 
 # result with env KEY="is not nil"
 assert "is not nil" == Application.get_env(:app, :can_be_nil)
+```
+
+## Concurrency & Cache
+
+By default Hush will fetch secrets from providers concurrently and will save them to a short-lived cache to prevent fetching the same secret multiple times.
+
+The defaults for these values are `System.schedulers_online/0` for concurrency, `5000ms` for concurrency timeouts and `60000ms` for cache entries.
+
+These values can be modified with the following configuration:
+
+```elixir
+# config/config.exs
+config :hush,
+  cache_ttl: 60_000, # seconds
+  max_concurrency: 10,
+  timeout: 5000, # milliseconds
 ```
 
 ## Transfomers

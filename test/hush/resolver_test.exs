@@ -1,11 +1,15 @@
 defmodule Hush.ResolverTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   doctest Hush.Resolver
 
   import Mox
 
   alias Hush.Resolver
   alias Hush.Provider.MockProvider
+
+  defmodule CustomError do
+    defstruct msg: ""
+  end
 
   describe "resolve/1" do
     test "with keyword lists" do
@@ -61,7 +65,7 @@ defmodule Hush.ResolverTest do
     end
 
     test "with provider exception" do
-      expect(MockProvider, :fetch, fn _ -> raise "error" end)
+      expect(MockProvider, :fetch, 2, fn _ -> raise "error" end)
       config = app_config({:hush, MockProvider, "key"})
 
       error = "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"key\"}: error"
@@ -69,11 +73,21 @@ defmodule Hush.ResolverTest do
     end
 
     test "with provider error" do
-      expect(MockProvider, :fetch, fn _ -> {:error, %{error: "error"}} end)
+      expect(MockProvider, :fetch, 2, fn _ -> {:error, %{error: "error"}} end)
       config = app_config({:hush, MockProvider, "key"})
 
       error =
         "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"key\"}: %{error: \"error\"}"
+
+      assert {:error, error} == Resolver.resolve(config)
+    end
+
+    test "with provider custom error struct" do
+      expect(MockProvider, :fetch, 2, fn _ -> {:error, %CustomError{msg: "errmsg"}} end)
+      config = app_config({:hush, MockProvider, "key"})
+
+      error =
+        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"key\"}: %Hush.ResolverTest.CustomError{msg: \"errmsg\"}"
 
       assert {:error, error} == Resolver.resolve(config)
     end
@@ -90,13 +104,32 @@ defmodule Hush.ResolverTest do
     end
 
     test "with required error" do
-      expect(MockProvider, :fetch, fn _ -> {:error, :not_found} end)
+      expect(MockProvider, :fetch, 2, fn _ -> {:error, :not_found} end)
       config = app_config({:hush, MockProvider, "HUSH_UNKNOWN"})
 
       error =
         "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"HUSH_UNKNOWN\"}: The provider couldn't find a value for this key. If this is an optional key, you add `optional: true` to the options list."
 
       assert {:error, error} == Resolver.resolve(config)
+    end
+
+    test "with optional set to true" do
+      expect(MockProvider, :fetch, 2, fn _ -> {:error, :not_found} end)
+      config = app_config({:hush, MockProvider, "HUSH_UNKNOWN", optional: true})
+      assert {:ok, app_config(nil)} == Resolver.resolve(config)
+    end
+
+    test "with default value" do
+      expect(MockProvider, :fetch, 2, fn _ -> {:error, :not_found} end)
+      config = app_config({:hush, MockProvider, "HUSH_UNKNOWN", default: :ok})
+      assert {:ok, app_config(:ok)} == Resolver.resolve(config)
+    end
+
+    test "with expired cache entry" do
+      expect(MockProvider, :fetch, 2, fn _ -> {:ok, "value"} end)
+      config = app_config({:hush, MockProvider, "HUSH_UNKNOWN", cache_ttl: 0})
+
+      assert {:ok, app_config("value")} == Resolver.resolve(config)
     end
 
     test "with cast error" do
@@ -110,11 +143,21 @@ defmodule Hush.ResolverTest do
     end
 
     test "with general error" do
-      expect(MockProvider, :fetch, fn _ -> "wrong return" end)
+      expect(MockProvider, :fetch, 2, fn _ -> "wrong return" end)
       config = app_config({:hush, MockProvider, "bar"})
 
       error =
         "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: Provider returned an unexpected value: \"wrong return\".\nExpected {:ok, value}, {:error, :not_found} or {:error, \"string\"}"
+
+      assert {:error, error} == Resolver.resolve(config)
+    end
+
+    test "with required value" do
+      expect(MockProvider, :fetch, 2, fn _ -> {:error, :not_found} end)
+      config = app_config({:hush, MockProvider, "bar"})
+
+      error =
+        "Could not resolve {:hush, Elixir.Hush.Provider.MockProvider, \"bar\"}: The provider couldn't find a value for this key. If this is an optional key, you add `optional: true` to the options list."
 
       assert {:error, error} == Resolver.resolve(config)
     end

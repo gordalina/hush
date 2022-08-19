@@ -1,5 +1,5 @@
 defmodule HushTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   doctest Hush
 
   import Mox
@@ -11,6 +11,7 @@ defmodule HushTest do
   end
 
   test "resolve!()" do
+    expect(MockProvider, :load, fn _ -> :ok end)
     expect(MockProvider, :fetch, fn _ -> {:ok, "bar"} end)
     Application.put_env(:hush, :test_resolve_1, {:hush, MockProvider, "bar"})
 
@@ -18,10 +19,19 @@ defmodule HushTest do
   end
 
   test "resolve!(config)" do
+    expect(MockProvider, :load, fn _ -> :ok end)
     expect(MockProvider, :fetch, fn _ -> {:ok, "bar"} end)
     config = [{:app, foo: {:hush, MockProvider, "bar"}}]
 
     assert Hush.resolve!(config) == [{:app, [foo: "bar"]}]
+  end
+
+  test "resolve!(config) with valid provider config" do
+    expect(MockProvider, :load, fn _ -> :ok end)
+    expect(MockProvider, :fetch, fn _ -> {:ok, "bar"} end)
+    config = [{:app, foo: {:hush, MockProvider, "bar"}}, {:hush, providers: [MockProvider]}]
+
+    assert Hush.resolve!(config) == [{:app, [foo: "bar"]}, {:hush, providers: [MockProvider]}]
   end
 
   test "resolve!(config) with invalid provider config" do
