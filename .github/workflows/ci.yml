@@ -48,8 +48,8 @@ jobs:
         run: mix format
       - name: Run Tests
         run: mix coveralls.github
-      - name: Upload results to codecov
-        run: bash <(curl -s https://codecov.io/bash)
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
 
   checks:
     name: static checks
