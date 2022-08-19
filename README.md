@@ -1,8 +1,9 @@
 # Hush
 
-[![Build Status](https://github.com/gordalina/hush/workflows/ci/badge.svg)](https://github.com/gordalina/hush/actions?query=workflow%3A%22ci%22)
-[![Coverage Status](https://coveralls.io/repos/gordalina/hush/badge.svg?branch=master)](https://coveralls.io/r/gordalina/hush?branch=master)
-[![hex.pm version](https://img.shields.io/hexpm/v/hush.svg)](https://hex.pm/packages/hush)
+[![Build Status](https://img.shields.io/github/workflow/status/gordalina/hush/ci?style=flat-square)](https://github.com/gordalina/hush/actions?query=workflow%3A%22ci%22)
+[![Coverage Status](https://img.shields.io/coveralls/github/gordalina/hush?style=flat-square)](https://coveralls.io/r/gordalina/hush?branch=master)
+[![hex.pm version](https://img.shields.io/hexpm/v/hush?style=flat-square)](https://hex.pm/packages/hush)
+[![hex.pm downloads](https://img.shields.io/hexpm/dt/hush?style=flat-square)]([LICENSE](https://hex.pm/packages/hush))
 
 Hush is designed to help developers configure their applications at runtime and in release mode, retrieving configuration from multiple providers, without having to depend on secret files or hardcoded configuration.
 
