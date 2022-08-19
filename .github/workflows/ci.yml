@@ -42,10 +42,14 @@ jobs:
           mix local.rebar --force
           mix local.hex --force
           mix deps.get
+      - name: Compile
+        run: mix compile --warnings-as-errors
       - name: Check Formatting
         run: mix format
       - name: Run Tests
         run: mix coveralls.github
+      - name: Upload results to codecov
+        run: bash <(curl -s https://codecov.io/bash)
 
   checks:
     name: static checks

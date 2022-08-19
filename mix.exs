@@ -19,8 +19,10 @@ defmodule Hush.MixProject do
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
+        "coveralls.detail": :test,
         "coveralls.github": :test,
-        "coveralls.detail": :test
+        "coveralls.html": :test,
+        "coveralls.json": :test
       ],
       dialyzer: [
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
