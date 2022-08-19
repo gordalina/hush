@@ -47,7 +47,7 @@ jobs:
       - name: Check Formatting
         run: mix format
       - name: Run Tests
-        run: mix coveralls.github
+        run: mix coveralls.json
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
 
