@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+- Fixed [#7](https://github.com/gordalina/hush/issues/7) where a provider error would raise an error rather than returning a good error message.
+
 ## v0.5.0
 
 - [#2](https://github.com/gordalina/hush/pull/2) Add Apply Transformer
