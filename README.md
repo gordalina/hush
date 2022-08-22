@@ -373,6 +373,13 @@ To implement that provider we can use the following code.
 end
 ```
 
+## Compatibility
+
+| Hush | Erlang/OTP | Elixir |
+| - | - | - |
+| `>= 0.6.0` | `>= 21.0.0` | `>= 1.10.0` |
+| `<= 0.5.0` | `>= 20.0.0` | `>= 1.9.0` |
+
 ## License
 
 Hush is released under the Apache License 2.0 - see the [LICENSE](LICENSE) file.

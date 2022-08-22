@@ -16,18 +16,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - otp: 20.3
-            elixir: 1.9.4
           - otp: 21.3
             elixir: 1.10.4
           - otp: 22.3
-            elixir: 1.10.4
-          - otp: 23.3
-            elixir: 1.10.4
-          - otp: 23.3
             elixir: 1.11.4
-          - otp: 24.3
+          - otp: 23.3
             elixir: 1.12.3
+          - otp: 24.3
+            elixir: 1.13.4
           - otp: 25.0
             elixir: 1.13.4
     runs-on: ubuntu-20.04
@@ -71,7 +67,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: priv/plts
-          key: ${{ hashFiles('mix.lock') }}-${{matrix.otp}}-${{matrix.elixir}}
+          key: ${{ hashFiles('mix.*') }}-${{matrix.otp}}-${{matrix.elixir}}
       - name: Install dependencies
         run: mix deps.get
       - name: Run checks
