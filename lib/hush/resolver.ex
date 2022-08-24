@@ -3,7 +3,7 @@ defmodule Hush.Resolver do
   Replace configuration with provider-aware resolvers.
   """
 
-  alias Hush.{Cache, Provider, Transformer}
+  alias Hush.{Provider, Transformer}
 
   @doc """
   Substitute {:hush, Hush.Provider, "key", [options]} present in the the config argument.
@@ -24,28 +24,20 @@ defmodule Hush.Resolver do
   def resolve!(config, options \\ Keyword.new()) do
     options = Keyword.take(options, [:max_concurrency, :timeout])
 
-    Cache.with(fn ->
-      config
-      |> preload_secrets(options)
-      |> reduce(&values/2)
-    end)
+    cache = config |> fill_cache(options)
+    config |> reduce(values(cache))
   end
 
-  defp preload_secrets(config, options) do
+  defp fill_cache(config, options) do
     config
     |> reduce(&flatten/2)
-    |> Enum.uniq_by(fn {provider, key, _} -> "#{provider}.#{key}" end)
-    |> Task.async_stream(fn {provider, key, opts} -> fetch(provider, key, opts) end, options)
-    |> Stream.run()
-
-    config
+    |> Stream.uniq_by(fn {provider, key, _} -> hash(provider, key) end)
+    |> Task.async_stream(fn {p, k, _} -> {hash(p, k), fetch(p, k)} end, options)
+    |> Enum.reduce(%{}, fn {:ok, {k, v}}, acc -> Map.put_new(acc, k, v) end)
   end
 
-  defp reduce(config, reducer), do: Enum.reduce(config, [], reducer)
-
-  @spec value!(module(), String.t(), Keyword.t()) :: any()
-  defp value!(provider, name, options) do
-    case value(provider, name, options) do
+  defp value!(provider, name, options, cache) do
+    case value(provider, name, options, cache) do
       {:ok, value} ->
         value
 
@@ -55,9 +47,8 @@ defmodule Hush.Resolver do
     end
   end
 
-  @spec value(module(), String.t(), Keyword.t()) :: {:ok, any()} | {:error, String.t()}
-  defp value(provider, key, options) do
-    with {:ok, value} <- fetch(provider, key, options),
+  defp value(provider, key, options, cache) do
+    with {:ok, value} <- fetch(provider, key, cache),
          {:ok, value} <- Transformer.apply(options, value) do
       {:ok, value}
     else
@@ -72,7 +63,6 @@ defmodule Hush.Resolver do
     end
   end
 
-  @spec default_or_error(Keyword.t()) :: {:ok, any()} | {:error, :required} | {:ok, nil}
   defp default_or_error(options) do
     cond do
       # lets get default if it exists
@@ -90,15 +80,18 @@ defmodule Hush.Resolver do
     end
   end
 
-  defp fetch(provider, key, options) do
-    Cache.get("#{provider}.#{key}", options, fn ->
-      try do
-        Provider.fetch(provider, key)
-      rescue
-        error ->
-          {:error, error.message}
-      end
-    end)
+  defp fetch(provider, key, cache \\ %{}) do
+    case Map.get(cache, hash(provider, key), nil) do
+      nil ->
+        try do
+          Provider.fetch(provider, key)
+        rescue
+          error -> {:error, error.message}
+        end
+
+      cached ->
+        cached
+    end
   end
 
   defp flatten({:hush, provider, name}, acc), do: acc ++ [{provider, name, []}]
@@ -108,15 +101,28 @@ defmodule Hush.Resolver do
   defp flatten(it, acc) when is_map(it) and not is_struct(it), do: acc ++ reduce(it, &flatten/2)
   defp flatten(_, acc), do: acc
 
-  defp values({:hush, provider, name}, acc), do: acc ++ [value!(provider, name, [])]
-  defp values({:hush, provider, name, opts}, acc), do: acc ++ [value!(provider, name, opts)]
-  defp values(it, acc) when is_list(it), do: acc ++ [reduce(it, &values/2)]
+  defp hash(provider, key), do: "#{provider}.#{key}"
+  defp reduce(config, reducer), do: Enum.reduce(config, [], reducer)
 
-  defp values(it, acc) when is_tuple(it),
-    do: acc ++ [Tuple.to_list(it) |> reduce(&values/2) |> List.to_tuple()]
+  defp values(cache) do
+    fn
+      {:hush, provider, name}, acc ->
+        acc ++ [value!(provider, name, [], cache)]
 
-  defp values(it, acc) when is_map(it) and not is_struct(it),
-    do: acc ++ [reduce(it, &values/2) |> Map.new()]
+      {:hush, provider, name, opts}, acc ->
+        acc ++ [value!(provider, name, opts, cache)]
 
-  defp values(it, acc), do: acc ++ [it]
+      it, acc when is_list(it) ->
+        acc ++ [reduce(it, values(cache))]
+
+      it, acc when is_tuple(it) ->
+        acc ++ [Tuple.to_list(it) |> reduce(values(cache)) |> List.to_tuple()]
+
+      it, acc when is_map(it) and not is_struct(it) ->
+        acc ++ [reduce(it, values(cache)) |> Map.new()]
+
+      it, acc ->
+        acc ++ [it]
+    end
+  end
 end
