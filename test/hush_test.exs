@@ -44,4 +44,12 @@ defmodule HushTest do
       fn -> Hush.resolve!(config) == [{:app, [foo: "bar"]}] end
     )
   end
+
+  test "resolve!(config) with child_spec" do
+    expect(MockProvider, :load, fn _ -> {:ok, [{HustTest.MockAgent, []}]} end)
+    expect(MockProvider, :fetch, fn _ -> {:ok, "bar"} end)
+    config = [{:app, foo: {:hush, MockProvider, "bar"}}, {:hush, providers: [MockProvider]}]
+
+    assert Hush.resolve!(config) == [{:app, [foo: "bar"]}, {:hush, providers: [MockProvider]}]
+  end
 end

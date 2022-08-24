@@ -7,7 +7,7 @@ defmodule Hush do
   Resolve configuration
 
   When called with resolve!/0 it will default to all loaded applications' configuration.
-  When called with resolve!/1 with the configuration as an arugment it will process that.
+  When called with resolve!/1 with the configuration as an argument it will process that.
   """
   @spec resolve!() :: Keyword.t()
   def resolve!() do
@@ -16,8 +16,16 @@ defmodule Hush do
 
   @spec resolve!(Keyword.t()) :: Keyword.t()
   def resolve!(config) when is_list(config) do
-    config |> load_providers!()
-    config |> Enum.map(&resolve!(&1))
+    {:ok, pid} =
+      config
+      |> load_providers!()
+      |> child_specs()
+      |> Supervisor.start_link(strategy: :one_for_one)
+
+    resolved = config |> Enum.map(&resolve!(&1))
+    Supervisor.stop(pid, :normal, 5000)
+
+    resolved
   end
 
   @spec resolve!({atom(), Keyword.t()}) :: {atom(), Keyword.t()}
@@ -43,8 +51,8 @@ defmodule Hush do
         {:error, message} ->
           raise ArgumentError, "Could not load provider #{provider}: #{message}"
 
-        _ ->
-          :ok
+        result ->
+          result
       end
     end
   end
@@ -62,4 +70,8 @@ defmodule Hush do
       {app, Application.get_all_env(app)}
     end
   end
+
+  defp child_specs(providers), do: Enum.reduce(providers, [], &child_specs_reducer/2)
+  defp child_specs_reducer({:ok, children}, acc), do: acc ++ children
+  defp child_specs_reducer(_, acc), do: acc
 end
