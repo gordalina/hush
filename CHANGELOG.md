@@ -1,7 +1,10 @@
 # Changelog
 
-## v1.0.0-rc.0
+## v1.0.0
 
+- Add support to load processes from providers.
+- Add asynchronous secret loading.
+- Prevent secrets to be fetched more than once.
 - Fixed [#7](https://github.com/gordalina/hush/issues/7) where a provider error would raise an error rather than returning a good error message.
 
 ## v0.5.0
