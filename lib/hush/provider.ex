@@ -5,7 +5,9 @@ defmodule Hush.Provider do
   You can [read here](https://hexdocs.pm/hush/readme.html#writing-your-own-provider) on how to write your own provider.
   """
 
-  @callback load(config :: Keyword.t()) :: :ok | {:error, any()}
+  @type child_spec :: Supervisor.child_spec()
+
+  @callback load(config :: Keyword.t()) :: :ok | {:ok, [child_spec()]} | {:error, any()}
   @callback fetch(key :: String.t()) :: {:ok, String.t()} | {:error, :not_found} | {:error, any()}
 
   @doc """

@@ -49,7 +49,7 @@ end
 
 Run `mix deps.get` to install it.
 
-Some providers may need to initialize applications to function correctly. The providers will be explicit about whether they need to be loaded at startup or not. `GcpSecretsManager` unlike `SystemEnvironment` is one such example. To load the provider you need to configure it like so. **Note:** `SystemEnvironment` does not need to be loaded at startup.
+Some providers may need to initialize applications or even start processes to function correctly. The providers will be explicit about whether they need to be loaded at startup or not. `GcpSecretsManager` unlike `SystemEnvironment` is one such example. To load the provider you need to configure it like so. **Note:** `SystemEnvironment` does not need to be loaded at startup.
 
 ```elixir
 # config/config.exs
@@ -332,10 +332,10 @@ would look in a app configuration.
 This behaviour expects two functions:
 
 - ```elixir
-  load(config :: Keyword.t()) :: :ok | {:error, any()}
+  load(config :: Keyword.t()) :: :ok | {:ok, [child_spec()]} | {:error, any()}
   ```
 
-  This function is called at startup time, here you can perform any initialization you need, such as loading applications that you depend on.
+  This function is called at startup time, here you can perform any initialization you need, such as loading applications that you depend on. If you need to startup any processes, you can return a list of `child_spec()` which will be brought up by Hush's supervisor and brought down after hush runs.
 
 - ```elixir
   fetch(key :: String.t()) :: {:ok, String.t()} | {:error, :not_found} | {:error, any()}
@@ -357,7 +357,7 @@ To implement that provider we can use the following code.
   @behaviour Hush.Provider
 
   @impl Hush.Provider
-  @spec load(config :: Keyword.t()) :: :ok | {:error, any()}
+  @spec load(config :: Keyword.t()) :: :ok | {:ok, [child_spec()]} | {:error, any()}
   def load(_config), do: :ok
 
   @impl Hush.Provider
