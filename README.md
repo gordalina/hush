@@ -42,7 +42,7 @@ Add `hush` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:hush, "~> 0.5.0"}
+    {:hush, "~> 1.0.0-rc.0"}
   ]
 end
 ```

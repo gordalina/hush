@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## v1.0.0-rc.0
 
 - Fixed [#7](https://github.com/gordalina/hush/issues/7) where a provider error would raise an error rather than returning a good error message.
 
