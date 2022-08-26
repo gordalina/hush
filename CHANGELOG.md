@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## v1.0.1
 
 - Display a warning when provider fetching times out
 
