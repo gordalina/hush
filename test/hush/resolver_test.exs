@@ -161,6 +161,15 @@ defmodule Hush.ResolverTest do
 
       assert {:error, error} == Resolver.resolve(config)
     end
+
+    test "with cache timeout" do
+      MockProvider
+      |> expect(:fetch, fn _ -> Process.sleep(25) end)
+      |> expect(:fetch, fn _ -> {:ok, "foo"} end)
+
+      config = app_config({:hush, MockProvider, "bar"})
+      assert {:ok, app_config("foo")} == Resolver.resolve(config, timeout: 0)
+    end
   end
 
   defp app_config(value) do

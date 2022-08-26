@@ -1,4 +1,6 @@
 defmodule Hush.Resolver do
+  require Logger
+
   @moduledoc """
   Replace configuration with provider-aware resolvers.
   """
@@ -8,7 +10,7 @@ defmodule Hush.Resolver do
   @doc """
   Substitute {:hush, Hush.Provider, "key", [options]} present in the the config argument.
   """
-  @spec resolve(Keyword.t()) :: {:ok, Keyword.t()} | {:error, any()}
+  @spec resolve(Keyword.t(), Keyword.t()) :: {:ok, Keyword.t()} | {:error, any()}
   def resolve(config, options \\ Keyword.new()) do
     try do
       {:ok, resolve!(config, options)}
@@ -20,20 +22,37 @@ defmodule Hush.Resolver do
   @doc """
   Substitute {:hush, Hush.Provider, "key", [options]} present in the the config argument
   """
-  @spec resolve!(Keyword.t() | map) :: Keyword.t()
+  @spec resolve!(Keyword.t() | map, Keyword.t()) :: Keyword.t()
   def resolve!(config, options \\ Keyword.new()) do
-    options = Keyword.take(options, [:max_concurrency, :timeout])
+    options =
+      options
+      |> Keyword.take([:max_concurrency, :timeout])
+      |> Keyword.put(:on_timeout, :kill_task)
 
-    cache = config |> fill_cache(options)
+    cache = config |> build_cache(options)
     config |> reduce(values(cache))
   end
 
-  defp fill_cache(config, options) do
+  defp build_cache(config, options) do
     config
     |> reduce(&flatten/2)
     |> Stream.uniq_by(fn {provider, key, _} -> hash(provider, key) end)
     |> Task.async_stream(fn {p, k, _} -> {hash(p, k), fetch(p, k)} end, options)
-    |> Enum.reduce(%{}, fn {:ok, {k, v}}, acc -> Map.put_new(acc, k, v) end)
+    |> Enum.reduce(%{}, fn
+      {:ok, {k, v}}, acc ->
+        Map.put_new(acc, k, v)
+
+      _, acc ->
+        """
+        A timeout ocurred resolving a key from a provider while warming the cache. Although this is not an issue if its isolated, but if there are multiple of these warnings you should consider increasing the timeout from the default of 5_000 milliseconds:
+
+          config :hush,
+            timeout: 10_000
+        """
+        |> Logger.warn()
+
+        acc
+    end)
   end
 
   defp value!(provider, name, options, cache) do

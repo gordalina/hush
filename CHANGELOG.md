@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+- Display a warning when provider fetching times out
+
 ## v1.0.0
 
 - Add support to load processes from providers.

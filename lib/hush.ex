@@ -14,23 +14,26 @@ defmodule Hush do
     runtime_config() |> resolve!()
   end
 
-  @spec resolve!(Keyword.t()) :: Keyword.t()
-  def resolve!(config) when is_list(config) do
+  @spec resolve!(Keyword.t(), Keyword.t()) :: Keyword.t()
+  def resolve!(config, options \\ Keyword.new())
+
+  def resolve!(config, options) when is_list(config) do
     {:ok, pid} =
       config
       |> load_providers!()
       |> child_specs()
       |> Supervisor.start_link(strategy: :one_for_one)
 
-    resolved = config |> Enum.map(&resolve!(&1))
-    Supervisor.stop(pid, :normal, 5000)
+    options = options || Application.get_all_env(:hush)
+    resolved = config |> Enum.map(&resolve!(&1, options))
+    Supervisor.stop(pid, :normal)
 
     resolved
   end
 
-  @spec resolve!({atom(), Keyword.t()}) :: {atom(), Keyword.t()}
-  def resolve!({app, config}) do
-    with config <- Hush.Resolver.resolve!(config),
+  @spec resolve!({atom(), Keyword.t()}, Keyword.t()) :: {atom(), Keyword.t()}
+  def resolve!({app, config}, options) do
+    with config <- Hush.Resolver.resolve!(config, options),
          :ok <- Application.put_all_env([{app, config}]) do
       {app, config}
     end
