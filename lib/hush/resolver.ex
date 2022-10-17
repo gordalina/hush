@@ -105,7 +105,7 @@ defmodule Hush.Resolver do
         try do
           Provider.fetch(provider, key)
         rescue
-          error -> {:error, error.message}
+          error -> {:error, Exception.message(error)}
         end
 
       cached ->
