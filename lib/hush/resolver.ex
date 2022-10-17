@@ -44,7 +44,7 @@ defmodule Hush.Resolver do
 
       _, acc ->
         """
-        A timeout ocurred resolving a key from a provider while warming the cache. Although this is not an issue if its isolated, but if there are multiple of these warnings you should consider increasing the timeout from the default of 5_000 milliseconds:
+        A timeout occurred resolving a key from a provider while warming the cache. Although this is not an issue if its isolated, but if there are multiple of these warnings you should consider increasing the timeout from the default of 5_000 milliseconds:
 
           config :hush,
             timeout: 10_000
