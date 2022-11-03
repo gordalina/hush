@@ -15,7 +15,7 @@ defmodule Hush.Transformer.Cast do
     try do
       {:ok, to!(type, value)}
     rescue
-      error -> {:error, "Couldn't cast to type #{type} due to #{error.message}"}
+      error -> {:error, "Couldn't cast to type #{type} due to #{Exception.message(error)}"}
     end
   end
 

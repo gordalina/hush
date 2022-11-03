@@ -20,7 +20,7 @@ defmodule Hush.Transformer do
       Enum.reduce(transformers(), {:ok, value}, reducer!(options))
     rescue
       error ->
-        {:error, error.message}
+        {:error, Exception.message(error)}
     end
   end
 
