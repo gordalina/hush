@@ -28,6 +28,7 @@ defmodule Hush.Resolver do
       options
       |> Keyword.take([:max_concurrency, :timeout])
       |> Keyword.put(:on_timeout, :kill_task)
+      |> Keyword.put(:ordered, false)
 
     cache = config |> build_cache(options)
     config |> reduce(values(cache))
