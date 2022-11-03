@@ -2,25 +2,31 @@
 
 defmodule Hush.Release do
   def run([version]) do
-    # ensure version is valid
-    Version.parse!(version)
+    parsed = Version.parse!(version)
+    is_release? = Version.match?(parsed, ">= 0.0.0", allow_pre: false)
 
     ensure_git_clean()
 
-    replace_infile("CHANGELOG.md", ~r/## Next/, "## v#{version}")
-    replace_infile("mix.exs", ~r/@version \".*\"/, "@version \"#{version}\"")
+    if is_release? do
+      replace_infile("CHANGELOG.md", ~r/## Next/, "## v#{version}")
+      replace_infile("mix.exs", ~r/@version \".*\"/, "@version \"#{version}\"")
 
-    replace_infile(
-      "README.md",
-      ~r/{:hush, \"~> .*\"}/,
-      "{:hush, \"~> #{version}\"}"
-    )
+      replace_infile(
+        "README.md",
+        ~r/{:hush, \"~> .*\"}/,
+        "{:hush, \"~> #{parsed.major}.#{parsed.minor}\"}"
+      )
 
-    show_git_diff()
+      show_git_diff()
+    end
+
     ensure_user_wants_release()
 
-    git(["add", "CHANGELOG.md", "README.md", "mix.exs"])
-    git(["commit", "-m", "v#{version}"])
+    if is_release? do
+      git(["add", "CHANGELOG.md", "README.md", "mix.exs"])
+      git(["commit", "-m", "v#{version}"])
+    end
+
     git(["tag", "v#{version}", "-m", "v#{version}"])
     git(["push"])
     git(["push", "--tags"])
