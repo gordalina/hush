@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.2
+
+- [#9](https://github.com/gordalina/hush/pull/9) Use Exception.message to retrieve error message. [@martosaur](https://github.com/martosaur)
+- [#10](https://github.com/gordalina/hush/pull/10) Do not buffer cache results in Task.async_stream. [@jramos](https://github.com/jramos)
+
 ## v1.0.1
 
 - Display a warning when provider fetching times out
