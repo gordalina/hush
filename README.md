@@ -1,6 +1,6 @@
 # Hush
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/gordalina/hush/ci.yml?branch=master&style=flat-square)](https://github.com/gordalina/hush/actions/workflows/ci.yml)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/gordalina/hush/ci.yml?style=flat-square)](https://github.com/gordalina/hush/actions/workflows/ci.yml)
 [![Coverage Status](https://img.shields.io/codecov/c/github/gordalina/hush?style=flat-square)](https://app.codecov.io/gh/gordalina/hush)
 [![hex.pm version](https://img.shields.io/hexpm/v/hush?style=flat-square)](https://hex.pm/packages/hush)
 [![hex.pm downloads](https://img.shields.io/hexpm/dt/hush?style=flat-square)]([LICENSE](https://hex.pm/packages/hush))
