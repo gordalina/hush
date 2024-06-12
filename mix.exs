@@ -1,7 +1,7 @@
 defmodule Hush.MixProject do
   use Mix.Project
 
-  @version "1.0.2"
+  @version "1.1.0"
   @source_url "https://github.com/gordalina/hush"
 
   def project do

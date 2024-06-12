@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.0
+
+- Add support for Elixir 1.17 and OTP 27
+- Drop support for Elixir 1.10
+
 ## v1.0.2
 
 - [#9](https://github.com/gordalina/hush/pull/9) Use Exception.message to retrieve error message. [@martosaur](https://github.com/martosaur)
