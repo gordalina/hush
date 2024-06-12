@@ -50,7 +50,7 @@ defmodule Hush.Resolver do
           config :hush,
             timeout: 10_000
         """
-        |> Logger.warn()
+        |> Logger.warning()
 
         acc
     end)
