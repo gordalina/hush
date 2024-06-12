@@ -34,7 +34,7 @@ defmodule Hush.Transformer.CastTest do
 
     test ":string", do: assert("bar" = Cast.to!(:string, "bar"))
     test ":atom", do: assert(:ok = Cast.to!(:atom, "ok"))
-    test ":charlist", do: assert('bar' = Cast.to!(:charlist, "bar"))
+    test ":charlist", do: assert(~c"bar" = Cast.to!(:charlist, "bar"))
     test ":float", do: assert(3.14 = Cast.to!(:float, "3.14"))
     test ":integer", do: assert(42 = Cast.to!(:integer, "42"))
     test ":boolean", do: assert(true = Cast.to!(:boolean, "true"))
