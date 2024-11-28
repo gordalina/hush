@@ -17,17 +17,13 @@ Hush can be used to inject configuration that is not known at compile time, such
 # config/prod.exs
 alias Hush.Provider.{AwsSecretsManager, FileSystem, GcpSecretManager, SystemEnvironment}
 
-config :app, Web.Endpoint,
-  http: [port: {:hush, SystemEnvironment, "PORT", [cast: :integer]}]
+config :hush, FileSystem, search_paths: ["/secrets"]
 
 config :app, App,
-  ssl_certificate: {:hush, FileSystem, "/secrets/cert.pem"}
-
-config :app, App,
-  cdn_url: {:hush, GcpSecretManager, "CDN_DOMAIN", [apply: &{:ok, "https://" <> &1}]}
-
-config :app, App.RedshiftRepo,
-  password: {:hush, AwsSecretsManager, "REDSHIFT_PASSWORD"}
+  pool_size: {:hush, SystemEnvironment, "POOL_SIZE", cast: :integer},
+  ssl_certificate: {:hush, FileSystem, "cert.pem"},
+  url: {:hush, GcpSecretManager, "APP_URL", [apply: &{:ok, "https://" <> &1}]},
+  password: {:hush, AwsSecretsManager, "PASSWORD"}
 ```
 
 Hush resolves configuration from using providers. It ships with `SystemEnvironment` and `FileSystem` providers, but multiple providers exist. You can also [write your own easily](#writing-your-own-provider).
