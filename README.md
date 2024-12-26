@@ -15,23 +15,23 @@ Hush can be used to inject configuration that is not known at compile time, such
 
 ```elixir
 # config/prod.exs
-alias Hush.Provider.{AwsSecretsManager, GcpSecretManager, SystemEnvironment}
+alias Hush.Provider.{AwsSecretsManager, FileSystem, GcpSecretManager, SystemEnvironment}
 
-config :app, Web.Endpoint,
-  http: [port: {:hush, SystemEnvironment, "PORT", [cast: :integer]}]
+config :hush, FileSystem, search_paths: ["/secrets"]
 
 config :app, App,
-  cdn_url: {:hush, GcpSecretManager, "CDN_DOMAIN", [apply: &{:ok, "https://" <> &1}]}
-
-config :app, App.RedshiftRepo,
-  password: {:hush, AwsSecretsManager, "REDSHIFT_PASSWORD"}
+  pool_size: {:hush, SystemEnvironment, "POOL_SIZE", cast: :integer},
+  ssl_certificate: {:hush, FileSystem, "cert.pem"},
+  url: {:hush, GcpSecretManager, "APP_URL", [apply: &{:ok, "https://" <> &1}]},
+  password: {:hush, AwsSecretsManager, "PASSWORD"}
 ```
 
-Hush resolves configuration from using providers, it ships with a `SystemEnvironment` provider which reads environmental variables, but multiple providers exist. You can also [write your own easily](#writing-your-own-provider).
+Hush resolves configuration from using providers. It ships with `SystemEnvironment` and `FileSystem` providers, but multiple providers exist. You can also [write your own easily](#writing-your-own-provider).
 
 | Provider            | Description                                                                               | Link                                                            |
 | ------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | `SystemEnvironment` | Reads environmental variables.                                                            |                                                                 |
+| `FileSystem`        | Reads contents of file.                                                                   |                                                                 |
 | `AwsSecretsManager` | Load secrets from [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/).         | [GitHub](https://github.com/gordalina/hush_aws_secrets_manager) |
 | `GcpSecretManager`  | Load secrets from [Google Cloud Secret Manager](https://cloud.google.com/secret-manager). | [GitHub](https://github.com/gordalina/hush_gcp_secret_manager)  |
 
@@ -49,7 +49,7 @@ end
 
 Run `mix deps.get` to install it.
 
-Some providers may need to initialize applications or even start processes to function correctly. The providers will be explicit about whether they need to be loaded at startup or not. `GcpSecretsManager` unlike `SystemEnvironment` is one such example. To load the provider you need to configure it like so. **Note:** `SystemEnvironment` does not need to be loaded at startup.
+Some providers may need to initialize applications or even start processes to function correctly. The providers will be explicit about whether they need to be loaded at startup or not. `GcpSecretsManager` unlike `SystemEnvironment` is one such example. To load the provider you need to configure it like so. **Note:** `SystemEnvironment` and `FileSystem` do not need to be loaded at startup.
 
 ```elixir
 # config/config.exs
@@ -375,6 +375,7 @@ end
 
 | Hush | Erlang/OTP | Elixir |
 | - | - | - |
+| `>= 1.2.0` | `>= 23.0.0` | `>= 1.12.0` |
 | `>= 1.0.0` | `>= 21.0.0` | `>= 1.10.0` |
 | `<= 0.5.0` | `>= 20.0.0` | `>= 1.9.0` |
 
