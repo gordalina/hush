@@ -28,6 +28,8 @@ jobs:
             elixir: "1.16.x"
           - otp: "27.x"
             elixir: "1.17.x"
+          - otp: "27.x"
+            elixir: "1.18.x"
     runs-on: ubuntu-20.04
     env:
       MIX_ENV: test
@@ -60,7 +62,7 @@ jobs:
       matrix:
         include:
           - otp: "27.x"
-            elixir: "1.17.x"
+            elixir: "1.18.x"
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
@@ -84,7 +86,7 @@ jobs:
       matrix:
         include:
           - otp: "27.x"
-            elixir: "1.17.x"
+            elixir: "1.18.x"
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
@@ -100,13 +102,13 @@ jobs:
           test -f doc/hush.epub && echo "doc/hush.epub exists."
 
   release:
-    if: "startsWith(github.ref, 'refs/tags/v')"
+    if: startsWith(github.ref, 'refs/tags/v')
     name: release
     strategy:
       matrix:
         include:
           - otp: "27.x"
-            elixir: "1.17.x"
+            elixir: "1.18.x"
     runs-on: ubuntu-20.04
     needs: [test, checks, docs]
     env:
