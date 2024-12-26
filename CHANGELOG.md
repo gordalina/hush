@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.0
+
+- Add FileSystem Provider
+
 ## v1.1.0
 
 - Add support for Elixir 1.17 and OTP 27
