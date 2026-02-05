@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## v1.3.0
 
 - Update to Elixir 1.19
 
