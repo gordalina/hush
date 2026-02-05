@@ -52,7 +52,7 @@ defmodule Hush.MixProject do
   defp elixirc_paths(_), do: ["lib"]
 
   defp description() do
-    "Extensible runtime configuration loader with pluggable providers"
+    "Load configuration and secrets from files, environment variables, AWS, GCP and more."
   end
 
   defp package() do

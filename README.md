@@ -5,7 +5,7 @@
 [![hex.pm version](https://img.shields.io/hexpm/v/hush?style=flat-square)](https://hex.pm/packages/hush)
 [![hex.pm downloads](https://img.shields.io/hexpm/dt/hush?style=flat-square)]([LICENSE](https://hex.pm/packages/hush))
 
-Hush is designed to help developers configure their applications at runtime and in release mode, retrieving configuration from multiple providers, without having to depend on secret files or hardcoded configuration.
+Hush is designed to help developers configure their applications at runtime and in release mode, retrieving configuration from environmental variables, files, AWS, GCP, and more, without having to depend on secret files or hardcoded configuration.
 
 Documentation can be found at [https://hexdocs.pm/hush](https://hexdocs.pm/hush).
 
