@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+- Update to Elixir 1.19
+
 ## v1.2.0
 
 - Add FileSystem Provider
