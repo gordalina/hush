@@ -30,7 +30,9 @@ jobs:
             elixir: "1.17.x"
           - otp: "27.x"
             elixir: "1.18.x"
-    runs-on: ubuntu-20.04
+          - otp: "28.x"
+            elixir: "1.19.x"
+    runs-on: ubuntu-latest
     env:
       MIX_ENV: test
     steps:
@@ -57,12 +59,12 @@ jobs:
 
   checks:
     name: static checks
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - otp: "27.x"
-            elixir: "1.18.x"
+          - otp: "28.x"
+            elixir: "1.19.x"
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
@@ -81,12 +83,12 @@ jobs:
 
   docs:
     name: docs
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - otp: "27.x"
-            elixir: "1.18.x"
+          - otp: "28.x"
+            elixir: "1.19.x"
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
@@ -107,9 +109,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - otp: "27.x"
-            elixir: "1.18.x"
-    runs-on: ubuntu-20.04
+          - otp: "28.x"
+            elixir: "1.19.x"
+    runs-on: ubuntu-latest
     needs: [test, checks, docs]
     env:
       HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
